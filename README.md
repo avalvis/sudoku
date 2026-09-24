@@ -46,7 +46,7 @@ Version 0.6.0 uses the name **Sudoku**, publisher **Antonis Valvis**, and websit
 - At three mistakes, restart or continue without a limit in Practice. Undo restores the board, not consumed hints, mistakes, or elapsed time.
 - Two hints per puzzle fill the selected empty/incorrect editable cell; otherwise the first eligible cell is used.
 - The clock pauses when the app loses focus, becomes hidden, leaves Classic, or restores a saved game. Resume is explicit.
-- A full, valid board completes the puzzle. Review it or start the next puzzle. New games cycle through fifteen puzzles at the selected difficulty. Enable **Technique graded** in Archive to browse the nine new graded puzzles directly.
+- A full, valid board completes the puzzle. Review it or start the next puzzle. New games cycle through 3,000 SE-rated puzzles at the selected difficulty. The 45 older fixtures remain available for saved games and replays.
 
 ## Architecture
 
@@ -77,13 +77,13 @@ Web Audio creates its context only after a user gesture. Sounds use short oscill
 
 ## Archive
 
-The Archive browses all 45 bundled puzzles in pages of nine, with board previews, difficulty filters, and a not-yet-completed filter. Filters return to the first page. Cards show completion counts (including Practice) and the best normal-game time. Returning to the current board preserves its progress; starting another puzzle or replay requires confirmation. Replays have new attempt IDs and retain all prior journal entries. The Archive shares the Classic engine and version-3 save format.
+The Archive browses 9,045 Classic puzzles (9,000 rated plus 45 legacy) in pages of nine. Rated puzzles appear first. It supports exact puzzle-number search, board previews, difficulty filters, and a not-yet-completed filter. Filters return to the first page. Cards show completion counts (including Practice) and the best normal-game time. Returning to the current board preserves its progress; starting another puzzle or replay requires confirmation. Replays have new attempt IDs and retain all prior journal entries. The Archive shares the Classic engine and version-3 save format.
 
 ## Daily editions
 
 Daily opens the device's current local date and works entirely offline. The date picker supports editions from 1 January 2026 through today; a saved-editions selector returns to earlier boards. Each date has a fixed difficulty. At midnight, the open board stays in place and an explicit button offers today's edition. There is no server clock or online leaderboard.
 
-Daily dates through 24 September 2026 use deterministic digit, row, column, band, stack, and transpose transformations of the nine original validated base fixtures. These preserve unique solvability; they are variations of the existing pack, not independently authored daily puzzles. From 25 September 2026, a versioned schedule uses the nine technique-graded fixtures. Every transformed board must still solve at its assigned technique tier; bounded retries fall back to a verified base fixture. A 32-entry cache avoids regrading on each move. The date-to-puzzle algorithms and base fixtures must stay stable for existing saves. A snapshot test pins a published edition; solution tests exercise a month of dates.
+Daily dates through 24 September 2026 use deterministic digit, row, column, band, stack, and transpose transformations of the nine original validated base fixtures. These preserve unique solvability; they are variations of the existing pack, not independently authored daily puzzles. The released 25 September 2026 edition retains its technique-graded mapping. From 26 September 2026, Daily uses a separate fixed collection of 4,002 SE-rated puzzles with no repeats during that interval or overlap with the rated Classic bank. No runtime transformation or grading is needed for these editions. The date-to-puzzle algorithms and base fixtures must stay stable for existing saves. A snapshot test pins a published edition; solution tests exercise a month of dates.
 
 The active board uses the existing gameplay components and actions. Switching modes or dates checkpoints and pauses it into `savedGames`, keyed by `classic` or `daily-YYYY-MM-DD`, then restores the selected edition atomically. Each edition retains its session ID, board, notes, full Undo history, timer, and counters. Switching never records abandonment. Restart affects only the open edition and retains previous results. Daily results are labeled by date in Stats; completed-day counts include Practice, with no streak system yet.
 
@@ -101,13 +101,15 @@ Reference conflicts were resolved in favor of the approved plan: four utility ac
 
 ## Puzzle fixtures and future work
 
+Version 0.8.0 adds 9,000 rated Classic puzzles and 4,002 separate Daily puzzles from the public-domain Sudoku Exchange dataset, pinned to an immutable revision. All 13,002 records pass independent unique-solution and duplicate checks. Run `npm run verify:puzzles` to verify the entire bank offline. Ratings are upstream Sukaku Explainer scores: Easy below 1.5, Medium below 2.5, and Hard below 5.0. See [PUZZLE_BANK.md](PUZZLE_BANK.md) for provenance, reproducible import, guarantees, and stable-ID rules. No claim of Sudoku.com-equivalent calibration is made.
+
 The included nine original fixtures are reproducibly authored by `scripts/create-puzzle-pack.mjs`, with 43/33/26 givens for Easy/Medium/Hard. Each is tested for a unique solution matching its stored solution. These initial difficulty labels use clue density; they are not a formal human-technique difficulty rating. The authoring script is not included in the app bundle.
 
-Version 0.5.0 adds 27 fixtures in `expanded-pack.json`, reproducibly authored by `node scripts/create-expanded-pack.mjs`. It generates randomized complete grids by backtracking, then removes clues while retaining exactly one solution. There are now 12 puzzles per difficulty. The original nine stay first in the catalog; new entries are appended so edition numbers, IDs, saves, and Daily mappings remain compatible. Daily intentionally continues to use the original pack. Do not reorder or change published fixtures.
+Version 0.5.0 adds 27 fixtures in `expanded-pack.json`, reproducibly authored by `node scripts/create-expanded-pack.mjs`. It generates randomized complete grids by backtracking, then removes clues while retaining exactly one solution. That release contained 12 puzzles per difficulty. The original nine stay first in the catalog; new entries are appended so edition numbers, IDs, saves, and Daily mappings remain compatible. At that version, Daily continued to use the original pack. Do not reorder or change published fixtures.
 
-Runtime puzzle generation, formally graded puzzle packs, cloud synchronization, daily streaks, automatic updates, signing, and Android are deferred. The game engine and persisted model do not depend on the desktop layout.
+Runtime puzzle generation, cloud synchronization, daily streaks, automatic updates, signing, and Android are deferred. The game engine and persisted model do not depend on the desktop layout.
 
-Run `node scripts/audit-puzzle-quality.mjs` to regenerate [PUZZLE_QUALITY.md](PUZZLE_QUALITY.md). The bounded logical solver checks singles, locked candidates, and naked pairs without guessing. The original Medium and Hard packs are mostly solvable with singles, so their clue-based labels must not be advertised as professional difficulty ratings. Version 0.7.0 appends nine technique-graded puzzles: Singles for Easy, Locked candidates for Medium, and Naked pairs for Hard. Generate them reproducibly with `node scripts/create-graded-pack.mjs`; bounded authoring rejects unsupported grades and nonunique solutions before writing the pack. Daily transformations preserve unique solutions and now verify technique tiers, but do not provide independently authored, human-calibrated daily puzzles. The report documents the gates required before introducing a new generator; published date mappings remain stable.
+Run `node scripts/audit-puzzle-quality.mjs` to regenerate [PUZZLE_QUALITY.md](PUZZLE_QUALITY.md). The bounded logical solver checks singles, locked candidates, and naked pairs without guessing. The original Medium and Hard packs are mostly solvable with singles, so their clue-based labels must not be advertised as professional difficulty ratings. Version 0.7.0 appends nine technique-graded puzzles: Singles for Easy, Locked candidates for Medium, and Naked pairs for Hard. Generate them reproducibly with `node scripts/create-graded-pack.mjs`; bounded authoring rejects unsupported grades and nonunique solutions before writing the pack. Those transformed fixtures are retained for earlier dates; the current default Classic library and future Daily schedule use the imported SE-rated bank. The report documents the gates required before introducing a new generator; published date mappings remain stable.
 
 ## Test coverage
 
@@ -126,5 +128,7 @@ Layout checks cover 900×700, 1280×900, 1440×900, 1920×1080, and 2560×1080 i
 `scripts/native-expanded-smoke.mjs` checks Archive pagination, opens added puzzle 036, and verifies its saved notes on relaunch with `--restore`. The same isolated-profile precautions apply.
 
 `scripts/native-graded-smoke.mjs` checks the technique filter, opens graded puzzle 043, and verifies saved notes on process restart with `--restore`. Use a fresh isolated profile for its first pass.
+
+`scripts/native-bank-smoke.mjs` checks Archive search, opens imported puzzle 9045, and verifies its saved notes after process restart with `--restore`. The same isolated-profile precautions apply.
 
 After `npm run desktop:build`, run `node scripts/release-checksums.mjs` to write SHA-256 hashes for the matching EXE and MSI into `src-tauri/target/release/bundle/SHA256SUMS.txt`. These identify the exact build artifacts; they do not replace publisher signing. Outstanding native release checks are tracked in `VERIFICATION.md`; runnable administrator/offline checks and the signing/DPI handoff are described in [WINDOWS_RELEASE.md](WINDOWS_RELEASE.md).

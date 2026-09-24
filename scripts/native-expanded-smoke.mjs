@@ -20,7 +20,8 @@ try {
     await expect(page.getByRole('article')).toHaveCount(9);
     await page.getByRole('combobox').selectOption('hard');
     await page.getByRole('button', { name: 'Next page', exact: true }).click();
-    await expect(page.getByRole('article')).toHaveCount(6);
+    await expect(page.getByRole('article')).toHaveCount(9);
+    await page.getByRole('searchbox', { name: 'Find puzzle number' }).fill('36');
     await page.getByRole('article', { name: 'Puzzle 036' }).getByRole('button', { name: 'Start puzzle' }).click();
     await page.getByRole('button', { name: 'Open puzzle', exact: true }).click();
     await page.getByRole('gridcell', { name: /empty/ }).first().click(); await page.keyboard.press('n'); await page.keyboard.press('2');
@@ -30,6 +31,7 @@ try {
   await page.getByRole('link', { name: 'Archive', exact: true }).click();
   await page.getByRole('combobox').selectOption('hard');
   await page.getByRole('button', { name: 'Next page', exact: true }).click();
+  await page.getByRole('searchbox', { name: 'Find puzzle number' }).fill('36');
   const current = page.getByRole('article', { name: 'Puzzle 036' });
   await expect(current).toContainText('Your puzzle in progress');
   await current.getByRole('link', { name: 'Return to puzzle' }).click();

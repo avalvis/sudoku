@@ -2,6 +2,7 @@ import data from './puzzle-pack.json' with { type: 'json' };
 import graded from './graded-pack.json' with { type: 'json' };
 import { gradePuzzle } from './grading';
 import type { Digit, Puzzle } from './types';
+import { bankDaily, bankDailyStart } from './bank';
 
 const gradedCache = new Map<string, Puzzle>();
 
@@ -16,6 +17,7 @@ export const gameSlot = (id: string) => isDaily(id) ? id : 'classic';
 /** Version-stable transformations preserve the base fixture's unique solution. */
 export function dailyPuzzle(date: string): Puzzle {
   if (!validDate(date)) throw new Error('Invalid daily date');
+  if (date >= bankDailyStart) return bankDaily(date);
   if (date >= '2026-09-25') {
     let puzzle = gradedCache.get(date);
     if (!puzzle) {

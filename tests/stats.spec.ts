@@ -1,7 +1,7 @@
 import { test, expect, type Page } from '@playwright/test';
-import puzzles from '../src/domain/puzzle-pack.json' with { type: 'json' };
+import { nextPuzzle } from '../src/domain/puzzles';
 
-const puzzle = puzzles.find(p => p.id === 'medium-1')!;
+const puzzle = nextPuzzle('medium');
 async function ready(page: Page) {
   await page.goto('/');
   await expect(page.locator('[role="gridcell"]')).toHaveCount(81);

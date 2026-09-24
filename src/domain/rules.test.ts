@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { puzzles } from './puzzles';
+import { legacyPuzzles as puzzles } from './puzzles';
 import { createBoard, findConflicts, isComplete, noteConflicts, remainingCounts, solve } from './rules';
 import { DIGITS, type Board, type Digit } from './types';
 

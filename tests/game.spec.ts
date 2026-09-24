@@ -1,7 +1,7 @@
 import { test, expect, type Page } from '@playwright/test';
-import puzzles from '../src/domain/puzzle-pack.json' with { type: 'json' };
+import { nextPuzzle } from '../src/domain/puzzles';
 
-const puzzle = puzzles.find(p => p.id === 'medium-1')!;
+const puzzle = nextPuzzle('medium');
 async function ready(page: Page) {
   await page.goto('/');
   await expect(page.locator('[role="gridcell"]')).toHaveCount(81);
@@ -37,14 +37,15 @@ test('keyboard play, notes, undo, hint, reload, and themes', async ({ page }) =>
 
 test('three duplicate entries pause, practice keeps counters, and held keys are ignored', async ({ page }) => {
   await ready(page); const cell = page.getByTestId('cell-0-0'); await cell.click();
-  for (const d of ['6', '8', '1']) await page.keyboard.press(d);
+  const duplicates = [...new Set(puzzle.givens.flatMap((row, r) => row.filter((v, c) => v !== null && (r === 0 || c === 0 || (r < 3 && c < 3)))))].slice(0, 3).map(String);
+  for (const d of duplicates) await page.keyboard.press(d);
   await expect(page.getByRole('dialog')).toContainText('Three mistakes');
   await page.getByRole('button', { name: 'Continue practice' }).click();
   await expect(page.getByTestId('mistakes')).toHaveText('3 total');
   await page.keyboard.press('Control+z');
-  await expect(cell).toHaveText('8'); await expect(page.getByTestId('mistakes')).toHaveText('3 total');
+  await expect(cell).toHaveText(duplicates[1]); await expect(page.getByTestId('mistakes')).toHaveText('3 total');
   await page.dispatchEvent('body', 'keydown', { key: '6', repeat: true });
-  await expect(cell).toHaveText('8');
+  await expect(cell).toHaveText(duplicates[1]);
 });
 
 test('completion, review, and next puzzle work end to end', async ({ page }) => {
@@ -58,7 +59,7 @@ test('completion, review, and next puzzle work end to end', async ({ page }) => 
   await expect(page.getByRole('dialog')).toHaveCount(0);
   await page.getByRole('button', { name: 'New puzzle' }).click();
   await page.getByRole('button', { name: 'Start puzzle', exact: true }).click();
-  await expect(page.getByText('No. 005', { exact: false })).toBeVisible();
+  await expect(page.getByText('No. 3047', { exact: false })).toBeVisible();
 });
 
 test('pause traps focus, suspends keys, and supports resume', async ({ page }) => {

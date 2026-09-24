@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import puzzles from '../src/domain/puzzle-pack.json' with { type: 'json' };
+import { puzzles, nextPuzzle } from '../src/domain/puzzles';
 
 test('archive filters, cancellation, exact puzzle selection, and restoration', async ({ page }) => {
   await page.goto('/');
@@ -8,6 +8,7 @@ test('archive filters, cancellation, exact puzzle selection, and restoration', a
   await expect(page.getByRole('article')).toHaveCount(9);
   await page.getByRole('combobox').selectOption('hard');
   await expect(page.getByRole('article')).toHaveCount(9);
+  await page.getByRole('searchbox', { name: 'Find puzzle number' }).fill('8');
   const card = page.getByRole('article', { name: 'Puzzle 008' });
   const start = card.getByRole('button', { name: 'Start puzzle' });
   await start.click(); await expect(page.getByRole('dialog')).toContainText('abandoned');
@@ -16,6 +17,7 @@ test('archive filters, cancellation, exact puzzle selection, and restoration', a
   await page.getByRole('button', { name: 'Resume' }).click();
   await expect(page.getByTestId('cell-0-0')).toHaveAttribute('aria-label', /notes 2/);
   await page.getByRole('link', { name: 'Archive', exact: true }).click();
+  await page.getByRole('searchbox', { name: 'Find puzzle number' }).fill('8');
   await card.getByRole('button', { name: 'Start puzzle' }).click();
   await page.getByRole('button', { name: 'Open puzzle', exact: true }).click();
   await expect(page).toHaveURL(/#classic$/);
@@ -33,21 +35,23 @@ test('archive filters, cancellation, exact puzzle selection, and restoration', a
 
 test('archive completion, replay, and current-board return preserve journal', async ({ page }) => {
   await page.goto('/');
-  const puzzle = puzzles.find(p => p.id === 'medium-1')!;
+  const puzzle = nextPuzzle('medium');
   for (let row = 0; row < 9; row++) for (let col = 0; col < 9; col++) {
     if (puzzle.givens[row][col] !== null) continue;
     await page.getByTestId(`cell-${row}-${col}`).click(); await page.keyboard.press(String(puzzle.solution[row][col]));
   }
   await page.getByRole('button', { name: 'Review board' }).click();
   await page.getByRole('link', { name: 'Archive', exact: true }).click();
-  await page.getByRole('checkbox', { name: 'Not yet completed' }).check(); await expect(page.getByRole('article', { name: 'Puzzle 004' })).toHaveCount(0);
+  await page.getByRole('searchbox', { name: 'Find puzzle number' }).fill('3046');
+  await page.getByRole('checkbox', { name: 'Not yet completed' }).check(); await expect(page.getByRole('article', { name: 'Puzzle 3046' })).toHaveCount(0);
   await page.getByRole('checkbox', { name: 'Not yet completed' }).uncheck();
-  const card = page.getByRole('article', { name: 'Puzzle 004' });
+  const card = page.getByRole('article', { name: 'Puzzle 3046' });
   await expect(card).toContainText('Current board · complete');
   await card.getByRole('button', { name: 'Replay puzzle' }).click();
   await page.getByRole('button', { name: 'Open puzzle', exact: true }).click();
   await expect(page.getByTestId('cell-0-0')).toHaveText('');
   await page.getByRole('link', { name: 'Archive', exact: true }).click();
+  await page.getByRole('searchbox', { name: 'Find puzzle number' }).fill('3046');
   await card.getByRole('link', { name: 'Return to puzzle' }).click();
   await page.getByRole('button', { name: 'Resume' }).click();
   await page.getByRole('link', { name: 'Stats', exact: true }).click();

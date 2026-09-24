@@ -4,7 +4,7 @@ export type Difficulty = 'easy' | 'medium' | 'hard';
 export interface CellPosition { row: number; col: number }
 export interface Cell { value: Digit | null; given: boolean; notes: Digit[] }
 export type Board = Cell[][];
-export interface Puzzle { id: string; difficulty: Difficulty; givens: (Digit | null)[][]; solution: Digit[][] }
+export interface Puzzle { id: string; difficulty: Difficulty; givens: (Digit | null)[][]; solution: Digit[][]; rating?: number }
 export interface Move { patches: { position: CellPosition; before: Cell; after: Cell }[] }
 export type SessionStatus = 'playing' | 'paused' | 'mistake-limit' | 'completed';
 export interface Session {

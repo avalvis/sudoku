@@ -1,7 +1,7 @@
 {
   "name": "sudoku",
   "private": true,
-  "version": "0.7.0",
+  "version": "0.8.0",
   "type": "module",
   "scripts": {
     "dev": "vite --host 127.0.0.1 --port 1420 --strictPort",
@@ -14,7 +14,8 @@
     "test:e2e": "playwright test",
     "tauri": "tauri",
     "desktop:dev": "tauri dev",
-    "desktop:build": "tauri build --bundles nsis,msi"
+    "desktop:build": "tauri build --bundles nsis,msi",
+    "verify:puzzles": "node scripts/verify-puzzle-bank.mjs"
   },
   "dependencies": {
     "@fontsource-variable/domine": "latest",

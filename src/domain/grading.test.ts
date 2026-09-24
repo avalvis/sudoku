@@ -1,6 +1,6 @@
 import { expect, it } from 'vitest';
 import { gradePuzzle } from './grading';
-import { puzzles } from './puzzles';
+import { legacyPuzzles as puzzles } from './puzzles';
 
 it('certifies the new pack by solving within its declared technique tier', () => {
   const expected = { easy: 'Singles', medium: 'Locked candidates', hard: 'Naked pairs' };

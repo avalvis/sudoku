@@ -1,0 +1,52 @@
+{
+  "version": 1,
+  "source": "https://github.com/grantm/sudoku-exchange-puzzle-bank",
+  "revision": "d8c8ebaee0c08c412cfba96af1923dfa61c83317",
+  "license": "Unlicense",
+  "ratingAuthority": "Sukaku Explainer (upstream supplied ratings)",
+  "classicCount": 9000,
+  "dailyCount": 4002,
+  "dailyStart": "2026-09-26",
+  "sources": {
+    "easy": {
+      "file": "easy.txt",
+      "sha256": "789aab6f52cc4588e0c3aa4269ad3282cfda7e1cc79ea693d16507decde3fc50"
+    },
+    "medium": {
+      "file": "medium.txt",
+      "sha256": "c2a5f8fac99dcf215b25d46ece47f346375e51730b182de70a6f8f2107b2b38d"
+    },
+    "hard": {
+      "file": "hard.txt",
+      "sha256": "abcff1512411e601abd5e861c60add5be5d877739b6faa249ee86960f5ad85e9"
+    }
+  },
+  "distribution": {
+    "2": 1083,
+    "3": 270,
+    "4": 270,
+    "1.2": 4334,
+    "1.5": 1084,
+    "1.7": 1084,
+    "2.3": 1083,
+    "2.5": 271,
+    "2.6": 270,
+    "2.8": 270,
+    "3.2": 270,
+    "3.4": 270,
+    "3.6": 270,
+    "3.8": 270,
+    "4.1": 270,
+    "4.2": 270,
+    "4.3": 270,
+    "4.4": 270,
+    "4.5": 270,
+    "4.6": 270,
+    "4.7": 270,
+    "4.8": 13
+  },
+  "sha256": {
+    "classic": "14eaf9beedce34d03de96b8c741ba1c8136793681339c0398fb58beaca740b1a",
+    "daily": "8db15360f581edd0aac08e5aa7b28842fb29396fe8605ce5b85397cbbf9e7d60"
+  }
+}

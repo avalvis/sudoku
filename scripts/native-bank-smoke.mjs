@@ -22,19 +22,19 @@ try {
     await page.getByRole('combobox').selectOption('hard');
 
     await expect(page.getByRole('article')).toHaveCount(9);
-    await page.getByRole('searchbox', { name: 'Find puzzle number' }).fill('43');
-    await page.getByRole('article', { name: 'Puzzle 043' }).getByRole('button', { name: 'Start puzzle' }).click();
+    await page.getByRole('searchbox', { name: 'Find puzzle number' }).fill('9045');
+    await page.getByRole('article', { name: 'Puzzle 9045' }).getByRole('button', { name: 'Start puzzle' }).click();
     await page.getByRole('button', { name: 'Open puzzle', exact: true }).click();
     await page.getByRole('gridcell', { name: /empty/ }).first().click(); await page.keyboard.press('n'); await page.keyboard.press('2');
   }
-  await expect(page.getByText(/No. 043/)).toBeVisible();
+  await expect(page.getByText(/No. 9045/)).toBeVisible();
   await expect(page.getByRole('gridcell', { name: /notes 2/ })).toBeVisible();
   await page.getByRole('link', { name: 'Archive', exact: true }).click();
   await page.getByRole('checkbox', { name: 'Technique graded' }).check();
   await page.getByRole('combobox').selectOption('hard');
 
-  await page.getByRole('searchbox', { name: 'Find puzzle number' }).fill('43');
-  const current = page.getByRole('article', { name: 'Puzzle 043' });
+  await page.getByRole('searchbox', { name: 'Find puzzle number' }).fill('9045');
+  const current = page.getByRole('article', { name: 'Puzzle 9045' });
   await expect(current).toContainText('Your puzzle in progress');
   await current.getByRole('link', { name: 'Return to puzzle' }).click();
   await page.getByRole('button', { name: 'Resume' }).click();
@@ -47,8 +47,8 @@ try {
       r.onsuccess = () => resolve(JSON.parse(r.result)); r.onerror = () => reject(r.error); tx.oncomplete = () => db.close();
     });
   });
-  expect(save.state.session.puzzleId).toBe('graded-v1-hard-1');
+  expect(save.state.session.puzzleId).toBe('bank-v1-9000');
   expect(save.state.results).toHaveLength(0);
   expect(errors).toEqual([]);
-  console.log(`Installed graded pack ${process.argv.includes('--restore') ? 'relaunch' : 'selection'} passed: puzzle 043, notes, filter, and no runtime errors.`);
+  console.log(`Installed rated bank ${process.argv.includes('--restore') ? 'relaunch' : 'selection'} passed: puzzle 9045, notes, filter, and no runtime errors.`);
 } finally { await browser.close(); }

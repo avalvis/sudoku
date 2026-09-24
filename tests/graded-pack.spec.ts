@@ -6,7 +6,8 @@ test('opens and completes a technique-graded Hard puzzle from Archive', async ({
   await page.getByRole('checkbox', { name: 'Technique graded' }).check();
   await expect(page.getByRole('article')).toHaveCount(9);
   await page.getByRole('combobox').selectOption('hard');
-  await expect(page.getByRole('article')).toHaveCount(3);
+  await expect(page.getByRole('article')).toHaveCount(9);
+  await page.getByRole('searchbox', { name: 'Find puzzle number' }).fill('43');
   await page.getByRole('article', { name: 'Puzzle 043' }).getByRole('button', { name: 'Start puzzle' }).click();
   await page.getByRole('button', { name: 'Open puzzle', exact: true }).click();
   const puzzle = graded.find(p => p.id === 'graded-v1-hard-1')!;

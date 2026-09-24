@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import type { StateStorage } from 'zustand/middleware';
 import { createGameStore } from './game-store';
-import { getPuzzle } from '../domain/puzzles';
+import { getPuzzle, nextPuzzle } from '../domain/puzzles';
 import { validateSave } from '../domain/validate-save';
 import { DIGITS, type Digit, type SavedGame } from '../domain/types';
 import { findConflicts, isPeer, remainingCounts } from '../domain/rules';
@@ -99,10 +99,10 @@ describe('game store', () => {
   });
   it('restarts the same puzzle and cycles the requested difficulty pack', () => {
     const { store } = setup(); store.getState().hint(); store.getState().newGame('medium', true);
-    expect(store.getState().session).toMatchObject({ puzzleId: 'medium-1', hintsRemaining: 2, mistakes: 0 });
+    expect(store.getState().session).toMatchObject({ puzzleId: nextPuzzle('medium').id, hintsRemaining: 2, mistakes: 0 });
     expect(store.getState().history).toHaveLength(0);
-    for (const id of [...Array.from({ length: 11 }, (_, i) => `medium-${i + 2}`), ...Array.from({ length: 3 }, (_, i) => `graded-v1-medium-${i + 1}`), 'medium-1']) { store.getState().newGame('medium'); expect(store.getState().session.puzzleId).toBe(id); }
-    store.getState().newGame('hard'); expect(store.getState().session.puzzleId).toBe('hard-1');
+    store.getState().newGame('medium'); expect(store.getState().session.puzzleId).toBe('bank-v1-3002');
+    store.getState().newGame('hard'); expect(store.getState().session.puzzleId).toBe('bank-v1-6001');
   });
   it('persists and restores complete undo history with the timer paused', async () => {
     const { store, storage, data } = setup(); store.getState().toggleNotes(); store.getState().input(2); store.getState().input(4);
