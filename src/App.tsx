@@ -12,9 +12,11 @@ import { ArchivePage } from './components/ArchivePage';
 import { isDaily, localDate } from './domain/daily';
 import { DailyEditionBar } from './components/DailyEditionBar';
 import { Opening } from './components/Opening';
+import { TutorialPage } from './components/TutorialPage';
 
-const tabs = ['Daily', 'Classic', 'Stats', 'Archive'] as const;
-const readRoute = () => { const route = location.hash.slice(1).toLowerCase(); return tabs.find(t => t.toLowerCase() === route) ?? 'Classic'; };
+const tabs = ['Daily', 'Classic', 'Stats', 'Archive', 'How to play'] as const;
+const tabRoute = (tab: string) => tab.toLowerCase().replaceAll(' ', '-');
+const readRoute = () => { const route = location.hash.slice(1).toLowerCase(); return tabs.find(t => tabRoute(t) === route) ?? 'Classic'; };
 const subscribeRoute = (callback: () => void) => { window.addEventListener('hashchange', callback); return () => window.removeEventListener('hashchange', callback); };
 
 function AppHeader({ route }: { route: string }) {
@@ -23,7 +25,7 @@ function AppHeader({ route }: { route: string }) {
   const { toggleTheme, toggleSound } = useGame.getState();
   return <header className="app-header"><div className="header-inner">
     <a className="masthead" href="#classic" aria-label="Sudoku home"><img src="/favicon.svg" width="40" height="40" alt="" /><span className="brand-name">Sudoku</span></a>
-    <nav aria-label="Main navigation">{tabs.map(tab => <a key={tab} href={`#${tab.toLowerCase()}`} aria-current={route === tab ? 'page' : undefined}>{tab}</a>)}</nav>
+    <nav aria-label="Main navigation">{tabs.map(tab => <a key={tab} href={`#${tabRoute(tab)}`} aria-current={route === tab ? 'page' : undefined}>{tab}</a>)}</nav>
     <div className="header-actions"><button className="icon-button" onClick={toggleSound} aria-label={sound ? 'Mute sound' : 'Enable sound'} title={sound ? 'Mute sound' : 'Enable sound'} aria-pressed={sound}>{sound ? <Volume2 size={19} /> : <VolumeX size={19} />}</button><span className="header-divider" /><button className="icon-button" onClick={toggleTheme} aria-label={theme === 'light' ? 'Switch to dark theme' : 'Switch to light theme'} title="Switch theme">{theme === 'light' ? <Moon size={19} /> : <Sun size={19} />}</button></div>
   </div></header>;
 }
@@ -68,7 +70,7 @@ export default function App() {
   return <MotionConfig reducedMotion="user"><a className="skip-link" href="#main-content" onClick={event => { event.preventDefault(); document.getElementById('main-content')?.focus(); }}>Skip to content</a>
     <AppHeader route={route} />
     {storageError && <div className="storage-notice" role="alert">{storageError}</div>}
-    {!hydrated ? <main className="loading-page"><span className="eyebrow">Loading…</span></main> : route === 'Classic' || route === 'Daily' ? <ClassicWorkspace open={setDialog} /> : route === 'Stats' ? <StatsPage /> : <ArchivePage />}
+    {!hydrated ? <main className="loading-page"><span className="eyebrow">Loading…</span></main> : route === 'Classic' || route === 'Daily' ? <ClassicWorkspace open={setDialog} /> : route === 'Stats' ? <StatsPage /> : route === 'Archive' ? <ArchivePage /> : <TutorialPage />}
     <div className="sr-only" role="status" aria-live="polite">{announcement}</div>
     {hydrated && <DialogHost key={`${route}-${dialog ?? 'session'}`} requested={dialog} close={() => setDialog(null)} classic={route === 'Classic' || route === 'Daily'} />}
   </MotionConfig>;

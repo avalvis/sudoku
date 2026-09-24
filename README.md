@@ -115,6 +115,12 @@ Run `node scripts/audit-puzzle-quality.mjs` to regenerate [PUZZLE_QUALITY.md](PU
 
 ## Test coverage
 
+### How to play
+
+The main menu opens a five-step interactive tutorial at `#how-to-play`: rows, columns, 3×3 boxes, combining clues, and pencil notes. Each practice example asks for one action, explains conflicting choices, and waits for the correct answer before enabling Next. Keyboard numbers, numpad, N, and Delete/Backspace work in the practice area. Users can leave at any point or replay the tutorial.
+
+`src/domain/tutorial.ts` contains the independent examples and conflict explanations; `TutorialPage` keeps practice state local to the component. The active Classic or Daily game pauses through the existing route lifecycle. Tutorial actions never enter the game store, history, statistics, or persistence. Returning to the same mode requires explicit Resume. The save schema is unchanged. Browser tests cover the complete walkthrough, both game modes, and light/dark layouts at 900×700, 1280×900, and 1920×1080.
+
 Unit/component tests cover fixture validity, conflicts, immutable givens, notes, hints, exhausted keys, full Undo, timers, completion, restarts, persistence, and corrupt history rejection. Browser tests cover complete gameplay, focus trapping, theme persistence, recovery, offline play, unavailable audio/storage, numpad input, and dark number contrast.
 
 Layout checks cover 900×700, 1280×900, 1440×900, 1920×1080, and 2560×1080 in both themes. Browser scale-factor tests approximate 125%, 150%, and 200% Windows display scaling; they do not replace a manual Windows DPI check. Screenshots are written to `test-results/`.

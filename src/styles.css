@@ -2,6 +2,7 @@
 @import "./reference-tokens.css";
 @import "./archive.css";
 @import "./daily.css";
+@import "./tutorial.css";
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
