@@ -1,8 +1,10 @@
 import data from './puzzle-pack.json';
 import type { Difficulty, Puzzle } from './types';
+import { dailyPuzzle, isDaily } from './daily';
 
 export const puzzles = data as Puzzle[];
 export const getPuzzle = (id: string): Puzzle => {
+  if (typeof id === 'string' && isDaily(id)) return dailyPuzzle(id.slice(6));
   const puzzle = puzzles.find(p => p.id === id);
   if (!puzzle) throw new Error('Unknown puzzle');
   return puzzle;

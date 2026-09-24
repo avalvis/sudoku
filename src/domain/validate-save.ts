@@ -2,6 +2,7 @@ import { getPuzzle } from './puzzles';
 import { DIGITS, type Cell, type SavedGame, type LegacySavedGame, type GameResult } from './types';
 import { isComplete } from './rules';
 import { recordResult } from './statistics';
+import { gameSlot } from './daily';
 
 const integer = (v: unknown, min = 0, max = Number.MAX_SAFE_INTEGER): v is number => typeof v === 'number' && Number.isSafeInteger(v) && v >= min && v <= max;
 const cellValid = (v: unknown): v is Cell => {
@@ -48,7 +49,7 @@ export function validateLegacySave(value: unknown): LegacySavedGame {
 const identifier = (value: unknown): value is string => typeof value === 'string' && /^[a-zA-Z0-9_-]{1,128}$/.test(value);
 const timestamp = (value: unknown): value is number | null => value === null || integer(value, 0, 8_640_000_000_000_000);
 
-export function validateSave(value: unknown): SavedGame {
+function validateSingle(value: unknown): SavedGame {
   validateLegacySave(value);
   const s = value as SavedGame;
   const session = s.session;
@@ -76,10 +77,24 @@ export function validateSave(value: unknown): SavedGame {
 }
 
 export function migrateSave(value: unknown, version: number): SavedGame {
+  if (version === 2) return validateSave({ ...validateSingle(value), savedGames: {} });
   if (version !== 1) throw new Error('This save uses an unsupported format.');
   const legacy = validateLegacySave(value);
   const session = { ...legacy.session, id: crypto.randomUUID(), started: legacy.history.length > 0 || legacy.session.mistakes > 0 || legacy.session.hintsRemaining < 2 || legacy.session.practice || legacy.session.status === 'completed', startedAt: null, completedAt: null };
   // Version 1 did not retain dates. Preserve that uncertainty rather than inventing a date.
   const results = session.status === 'completed' ? recordResult([], session, 'completed', null) : [];
-  return validateSave({ ...legacy, session, results });
+  return validateSave({ ...legacy, session, results, savedGames: {} });
+}
+
+export function validateSave(value: unknown): SavedGame {
+  const saved = validateSingle(value);
+  if (!saved.savedGames || typeof saved.savedGames !== 'object' || Array.isArray(saved.savedGames)) throw new Error('Invalid saved editions');
+  const ids = new Set([saved.session.id]);
+  for (const [slot, progress] of Object.entries(saved.savedGames)) {
+    if (!progress || typeof progress !== 'object') throw new Error('Invalid saved edition');
+    validateSingle({ ...progress, theme: saved.theme, soundEnabled: saved.soundEnabled, results: saved.results });
+    if (slot !== gameSlot(progress.session.puzzleId) || slot === gameSlot(saved.session.puzzleId) || ids.has(progress.session.id) || progress.session.status === 'playing') throw new Error('Invalid edition slot');
+    ids.add(progress.session.id);
+  }
+  return saved;
 }

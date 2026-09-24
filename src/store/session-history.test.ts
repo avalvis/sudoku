@@ -85,7 +85,7 @@ describe('save migration and result validation', () => {
     const restored = createGameStore(storage); await restored.persist.rehydrate();
     expect(restored.getState()).toMatchObject({ board: before.board, history: before.history, theme: 'dark', results: [] });
     expect(restored.getState().session).toMatchObject({ started: true, startedAt: null, status: 'paused', elapsedSeconds: 9 });
-    const migrated = JSON.parse(data.get(KEY)!); expect(migrated.version).toBe(2);
+    const migrated = JSON.parse(data.get(KEY)!); expect(migrated.version).toBe(3);
     const again = createGameStore(storage); await again.persist.rehydrate(); expect(again.getState().session.id).toBe(restored.getState().session.id);
   });
   it('imports a legacy completed puzzle exactly once, without fabricating historical dates', async () => {

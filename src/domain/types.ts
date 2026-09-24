@@ -33,6 +33,7 @@ export interface GameResult {
   endedAt: number | null;
 }
 export interface SavedGame {
+  savedGames: Record<string, GameProgress>;
   board: Board;
   selected: CellPosition;
   notesMode: boolean;
@@ -42,6 +43,7 @@ export interface SavedGame {
   theme: 'light' | 'dark';
   soundEnabled: boolean;
 }
-export type LegacySavedGame = Omit<SavedGame, 'session' | 'results'> & {
+export type GameProgress = Pick<SavedGame, 'board' | 'selected' | 'notesMode' | 'history' | 'session'>;
+export type LegacySavedGame = Omit<SavedGame, 'session' | 'results' | 'savedGames'> & {
   session: Omit<Session, 'id' | 'started' | 'startedAt' | 'completedAt'>;
 };

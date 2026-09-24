@@ -29,8 +29,8 @@ test('keyboard play, notes, undo, hint, reload, and themes', async ({ page }) =>
   await page.getByRole('button', { name: /Hint/ }).click();
   await expect(cell).toHaveText(String(puzzle.solution[0][0]));
   await page.getByRole('link', { name: 'Daily', exact: true }).click();
-  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Tomorrow’s ritual.');
-  await page.getByRole('link', { name: 'Return to Classic' }).click();
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('A daily ritual.');
+  await page.getByRole('link', { name: 'Classic', exact: true }).click();
   await expect(page.getByRole('dialog')).toContainText('Take your time.');
   expect(errors).toEqual([]);
 });

@@ -61,7 +61,7 @@ State changes go through guarded store actions. Each effective move records the 
 
 The runtime clock uses `performance.now()`. Whole seconds are checkpointed on moves, pause, and every five seconds, retaining fractional time between checkpoints. A forced process termination can lose the most recent uncheckpointed seconds or an in-flight IndexedDB transaction.
 
-The version-2 IndexedDB save contains the board, selection, notes mode, full undo history, session, preferences, and result journal. Results and board state are committed in one snapshot; stable attempt IDs prevent duplicate completion records. Restore validates cell invariants, immutable givens, session values, the history chain, and result consistency. Corrupt or unsupported saves are preserved until the player explicitly chooses Start Fresh. If storage is unavailable or full, play continues with a visible warning and later writes retry. There is no artificial Undo or journal limit; practical capacity is bounded by available memory/storage.
+The version-3 IndexedDB save contains the board, selection, notes mode, full undo history, session, preferences, result journal, and separately saved editions. Results and board state are committed in one snapshot; stable attempt IDs prevent duplicate completion records. Restore validates cell invariants, immutable givens, session values, the history chain, and result consistency. Corrupt or unsupported saves are preserved until the player explicitly chooses Start Fresh. If storage is unavailable or full, play continues with a visible warning and later writes retry. There is no artificial Undo or journal limit; practical capacity is bounded by available memory/storage.
 
 Version-1 saves migrate automatically with board, notes, Undo, time, and preferences intact. A saved completed puzzle is imported once. Earlier versions did not retain dates or older results, so imported dates are labeled unavailable and previously discarded games cannot be reconstructed.
 
@@ -69,13 +69,23 @@ Version-1 saves migrate automatically with board, notes, Undo, time, and prefere
 
 Stats shows completion rate, completed puzzles, best and average completion times, mistakes, hints, difficulty breakdowns, and paginated history. Normal and Practice games have separate views, with an optional difficulty filter. All data stays on this device.
 
-An attempt starts on the first effective board change, including a note or hint. Replacing or restarting a started unfinished puzzle records an abandoned attempt; pausing, closing, or navigating away does not. Completion rate includes the current started attempt in its denominator. Undoing every move does not erase the attempt. Continue Practice classifies the whole attempt as Practice. Times include completed games with hints; mistakes and hints remain cumulative. Results are ordered by finalization, even if the system clock changes.
+An attempt starts on the first effective board change, including a note or hint. Replacing or restarting a started unfinished puzzle records an abandoned attempt; pausing, closing, or navigating away does not. Completion rate includes all started unfinished boards in its denominator, including saved daily editions. Undoing every move does not erase the attempt. Continue Practice classifies the whole attempt as Practice. Times include completed games with hints; mistakes and hints remain cumulative. Results are ordered by finalization, even if the system clock changes.
 
 Web Audio creates its context only after a user gesture. Sounds use short oscillator/gain envelopes, disconnect finished nodes, and fail harmlessly if audio is unavailable. Audio objects never enter persisted state.
 
 ## Archive
 
-The Archive browses all nine bundled puzzles with board previews, difficulty filters, and a not-yet-completed filter. Cards show completion counts (including Practice) and the best normal-game time. Returning to the current board preserves its progress; starting another puzzle or replay requires confirmation. Replays have new attempt IDs and retain all prior journal entries. The Archive shares the Classic engine and version-2 save format.
+The Archive browses all nine bundled puzzles with board previews, difficulty filters, and a not-yet-completed filter. Cards show completion counts (including Practice) and the best normal-game time. Returning to the current board preserves its progress; starting another puzzle or replay requires confirmation. Replays have new attempt IDs and retain all prior journal entries. The Archive shares the Classic engine and version-3 save format.
+
+## Daily editions
+
+Daily opens the device's current local date and works entirely offline. The date picker supports editions from 1 January 2026 through today; a saved-editions selector returns to earlier boards. Each date has a fixed difficulty. At midnight, the open board stays in place and an explicit button offers today's edition. There is no server clock or online leaderboard.
+
+Daily puzzles use deterministic digit, row, column, band, stack, and transpose transformations of the nine validated base fixtures. These preserve unique solvability; they are variations of the existing pack, not independently authored daily puzzles. The date-to-puzzle algorithm and base fixtures must stay stable for existing saves. A snapshot test pins a published edition; solution tests exercise a month of dates.
+
+The active board uses the existing gameplay components and actions. Switching modes or dates checkpoints and pauses it into `savedGames`, keyed by `classic` or `daily-YYYY-MM-DD`, then restores the selected edition atomically. Each edition retains its session ID, board, notes, full Undo history, timer, and counters. Switching never records abandonment. Restart affects only the open edition and retains previous results. Daily results are labeled by date in Stats; completed-day counts include Practice, with no streak system yet.
+
+Version-2 saves migrate to version 3 without changing their board or journal. Version-1 migration remains supported. All parked boards and their history chains are validated on restoration. Practical retention is bounded by device storage; there is no automatic deletion of old daily progress.
 
 ## Desktop design
 
@@ -89,7 +99,7 @@ Reference conflicts were resolved in favor of the approved plan: four utility ac
 
 The included nine original fixtures are reproducibly authored by `scripts/create-puzzle-pack.mjs`, with 43/33/26 givens for Easy/Medium/Hard. Each is tested for a unique solution matching its stored solution. These initial difficulty labels use clue density; they are not a formal human-technique difficulty rating. The authoring script is not included in the app bundle.
 
-Daily is explicitly labeled a future edition. Runtime puzzle generation, formally graded puzzle packs, cloud synchronization, a daily calendar, automatic updates, signing, and Android are deferred. The game engine and persisted model do not depend on the desktop layout.
+Independent puzzle generation, formally graded puzzle packs, cloud synchronization, daily streaks, automatic updates, signing, and Android are deferred. The game engine and persisted model do not depend on the desktop layout.
 
 ## Test coverage
 
@@ -102,3 +112,5 @@ Layout checks cover 900×700, 1280×900, 1440×900, 1920×1080, and 2560×1080 i
 `scripts/native-stats-smoke.mjs` completes a puzzle and checks its persisted journal entry in native WebView2. Relaunch the app with the same isolated profile and run with `--restore` to check that exactly one result survives the process restart.
 
 `scripts/native-archive-smoke.mjs` opens a specific Archive puzzle, adds a note, and verifies return-to-board behavior; `--restore` checks that selection and notes survive native relaunch. Use a new isolated profile for its first run.
+
+`scripts/native-daily-smoke.mjs` checks independent Classic and Daily progress, including a process restart with `--restore`. Run against a new isolated profile on the same local calendar date for both passes.

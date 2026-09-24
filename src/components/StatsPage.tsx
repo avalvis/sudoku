@@ -4,6 +4,7 @@ import { useGame } from '../store/game-store';
 import { DIFFICULTIES, summarizeResults, type DifficultyFilter } from '../domain/statistics';
 import { formatTime } from '../domain/format';
 import type { GameResult } from '../domain/types';
+import { isDaily } from '../domain/daily';
 
 const timeOrDash = (seconds: number | null) => seconds === null ? '—' : formatTime(seconds);
 const dateFormatter = new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeStyle: 'short' });
@@ -16,7 +17,7 @@ function ResultJournal({ results }: { results: GameResult[] }) {
       <caption className="sr-only">Game history, most recently finished first</caption>
       <thead><tr><th scope="col">Puzzle / finished</th><th scope="col">Difficulty</th><th scope="col">Outcome</th><th scope="col">Time</th><th scope="col">Mistakes</th><th scope="col">Hints used</th></tr></thead>
       <tbody>{results.slice(0, visibleCount).map(result => <tr key={result.id}>
-        <th scope="row"><span className="result-puzzle">Classic · {result.puzzleId}</span><span className="result-date">{result.endedAt === null ? 'Earlier game · date unavailable' : <time dateTime={new Date(result.endedAt).toISOString()}>{dateFormatter.format(result.endedAt)}</time>}</span></th>
+        <th scope="row"><span className="result-puzzle">{isDaily(result.puzzleId) ? `Daily · ${result.puzzleId.slice(6)}` : `Classic · ${result.puzzleId}`}</span><span className="result-date">{result.endedAt === null ? 'Earlier game · date unavailable' : <time dateTime={new Date(result.endedAt).toISOString()}>{dateFormatter.format(result.endedAt)}</time>}</span></th>
         <td className="capitalize">{result.difficulty}</td>
         <td><span className={`result-outcome ${result.outcome}`}>{result.outcome === 'completed' && <Check size={12} />}{result.outcome === 'completed' ? 'Completed' : 'Abandoned'}</span></td>
         <td className="stats-numeric">{formatTime(result.elapsedSeconds)}</td><td className="stats-numeric">{result.mistakes}</td><td className="stats-numeric">{result.hintsUsed}</td>
@@ -29,10 +30,12 @@ function ResultJournal({ results }: { results: GameResult[] }) {
 export function StatsPage() {
   const results = useGame(s => s.results);
   const session = useGame(s => s.session);
+  const savedGames = useGame(s => s.savedGames);
+  const parked = useMemo(() => Object.values(savedGames).map(game => game.session), [savedGames]);
   const [practice, setPractice] = useState(false);
   const [difficulty, setDifficulty] = useState<DifficultyFilter>('all');
-  const stats = useMemo(() => summarizeResults(results, session, practice, difficulty), [results, session, practice, difficulty]);
-  const byDifficulty = useMemo(() => DIFFICULTIES.map(d => ({ difficulty: d, ...summarizeResults(results, session, practice, d) })), [results, session, practice]);
+  const stats = useMemo(() => summarizeResults(results, session, practice, difficulty, parked), [results, session, practice, difficulty, parked]);
+  const byDifficulty = useMemo(() => DIFFICULTIES.map(d => ({ difficulty: d, ...summarizeResults(results, session, practice, d, parked) })), [results, session, practice, parked]);
   const rows = difficulty === 'all' ? byDifficulty : byDifficulty.filter(row => row.difficulty === difficulty);
   return <main id="main-content" tabIndex={-1} className="stats-page">
     <header className="stats-heading"><div><span className="eyebrow">Your personal puzzle journal</span><h1>Progress, in perspective<span className="title-period">.</span></h1><p>A record of the time, thought, and patience you put into every page.</p></div><BookOpen size={36} strokeWidth={1.1} aria-hidden="true" /></header>
@@ -48,12 +51,12 @@ export function StatsPage() {
       <div className="stat-card"><span className="eyebrow">Average time</span><strong data-testid="stats-average">{timeOrDash(stats.averageSeconds)}</strong><span>Completed puzzles only</span></div>
     </section>
     <div className="stats-totals"><span><strong>{stats.abandoned}</strong> abandoned</span><span><strong>{stats.active}</strong> in progress</span><span><strong>{stats.mistakes}</strong> mistakes</span><span><strong>{stats.hintsUsed}</strong> hints used</span></div>
-    {stats.active > 0 && <div className="stats-active"><Clock3 size={18} /><span>Your current puzzle is waiting right where you left it.</span><a href="#classic">Return to puzzle <ArrowRight size={15} /></a></div>}
+    {stats.active > 0 && <div className="stats-active"><Clock3 size={18} /><span>{stats.active === 1 ? 'Your current puzzle is waiting right where you left it.' : `${stats.active} puzzles are saved in progress.`}</span><a href={isDaily(session.puzzleId) ? '#daily' : '#classic'}>Return to puzzle <ArrowRight size={15} /></a></div>}
     {stats.attempts === 0 && <div className="stats-introduction"><Feather size={22} strokeWidth={1.3} /><p>{practice ? 'There are no practice attempts in this selection yet.' : 'Your journal begins with your first digit, pencil note, or hint.'} <a href="#classic">Find your focus <ArrowRight size={13} /></a></p></div>}
     <section className="stats-section" aria-labelledby="difficulty-stats-title"><div className="stats-section-heading"><h2 id="difficulty-stats-title">At every difficulty</h2><span className="eyebrow">{practice ? 'Practice' : 'Normal'} · {difficulty === 'all' ? 'All difficulties' : difficulty}</span></div>
       <div className="stats-table-scroll"><table className="difficulty-stats-table"><caption className="sr-only">Statistics by difficulty</caption><thead><tr><th scope="col">Difficulty</th><th scope="col">Started</th><th scope="col">Completed</th><th scope="col">Completion</th><th scope="col">Best time</th><th scope="col">Average time</th></tr></thead><tbody>{rows.map(row => <tr key={row.difficulty}><th scope="row" className="capitalize"><i className={`difficulty-dot ${row.difficulty}`} />{row.difficulty}</th><td>{row.attempts}</td><td>{row.completed}</td><td>{row.completionRate === null ? '—' : `${row.completionRate}%`}</td><td>{timeOrDash(row.bestSeconds)}</td><td>{timeOrDash(row.averageSeconds)}</td></tr>)}</tbody></table></div>
     </section>
     <section className="stats-section" aria-labelledby="journal-title"><div className="stats-section-heading"><h2 id="journal-title">The pages you’ve turned</h2><span className="eyebrow">Most recent first</span></div><ResultJournal key={`${practice}-${difficulty}`} results={stats.results} /></section>
-    <footer className="stats-footnote"><p>An attempt starts with the first board change. Restarting or replacing it records an abandoned attempt; pausing or closing the app does not. Your current started puzzle counts toward completion rate. Times use completed puzzles, including those with hints.</p><span>Saved on this device. One puzzle at a time.</span></footer>
+    <footer className="stats-footnote"><p>An attempt starts with the first board change. Restarting or replacing it records an abandoned attempt; pausing, closing, or switching editions does not. All started boards count toward completion rate. Times use completed puzzles, including those with hints. Classic and Daily results are included.</p><span>Saved on this device. One square at a time.</span></footer>
   </main>;
 }

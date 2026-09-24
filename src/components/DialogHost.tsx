@@ -4,6 +4,7 @@ import { Dialog } from './Dialog';
 import { formatTime } from '../domain/format';
 import { useGame } from '../store/game-store';
 import type { Difficulty, Move } from '../domain/types';
+import { isDaily } from '../domain/daily';
 
 export type RequestedDialog = 'new' | 'restart' | 'difficulty' | null;
 
@@ -19,7 +20,7 @@ export function DialogHost({ requested, close, classic }: { requested: Requested
     <p>Your saved game could not be read safely. Start a fresh Medium puzzle to replace it. Your original save will stay untouched until you choose to continue.</p>
     <button className="primary-button" onClick={() => { recover(); location.hash = 'classic'; }}>Start fresh</button>
   </Dialog>;
-  if (requested) return <Dialog title={requested === 'restart' ? 'Begin again.' : requested === 'difficulty' ? 'Find your pace.' : 'Turn a fresh page.'} eyebrow="The classic collection" onClose={close}>
+  if (requested) return <Dialog title={requested === 'restart' ? 'Begin again.' : requested === 'difficulty' ? 'Find your pace.' : 'Turn a fresh page.'} eyebrow={isDaily(session.puzzleId) ? 'The daily edition' : 'The classic collection'} onClose={close}>
     <p>{requested === 'restart' ? 'Reset this puzzle, its timer, mistakes, and hints. Your current progress will be replaced.' : 'Choose a little challenge for your day. Starting a new puzzle replaces your current progress.'}{session.started && session.status !== 'completed' ? ' This attempt will be saved as abandoned in your journal.' : ''}</p>
     {requested !== 'restart' && <fieldset className="difficulty-options"><legend>Difficulty</legend>{(['easy', 'medium', 'hard'] as const).map(d => <label key={d} className={difficulty === d ? 'chosen' : ''}>
       <input type="radio" name="difficulty" value={d} checked={difficulty === d} onChange={() => setDifficulty(d)} />
@@ -41,7 +42,7 @@ export function DialogHost({ requested, close, classic }: { requested: Requested
     <Feather className="dialog-illustration" size={38} strokeWidth={1.2} />
     <p>One square at a time, the whole picture comes together.</p>
     <div className="completion-details"><div><span>Time</span><strong>{formatTime(session.elapsedSeconds)}</strong></div><div><span>Mistakes</span><strong>{session.mistakes}</strong></div><div><span>Hints used</span><strong>{2 - session.hintsRemaining}</strong></div></div>
-    <div className="dialog-actions"><button className="secondary-button" onClick={() => setReviewed(history)}>Review board</button><button className="primary-button" onClick={() => start(session.difficulty)}>Next puzzle</button></div>
+    <div className="dialog-actions"><button className="secondary-button" onClick={() => setReviewed(history)}>Review board</button>{isDaily(session.puzzleId) ? <a className="primary-button" href="#classic">Return to Classic</a> : <button className="primary-button" onClick={() => start(session.difficulty)}>Next puzzle</button>}</div>
   </Dialog>;
   return null;
 }

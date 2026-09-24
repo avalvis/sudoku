@@ -4,6 +4,7 @@ import { createBoard, cellId, findConflicts, isComplete, remainingCounts } from 
 import { getPuzzle, nextPuzzle } from '../domain/puzzles';
 import { migrateSave, validateSave } from '../domain/validate-save';
 import { recordResult } from '../domain/statistics';
+import { dailyPuzzle, gameSlot, isDaily, localDate } from '../domain/daily';
 import type { Cell, CellPosition, Difficulty, Digit, Puzzle, SavedGame } from '../domain/types';
 import { audio } from '../services/audio';
 import { indexedDbStorage, onStorageNotice } from '../services/storage';
@@ -25,6 +26,7 @@ export interface GameStore extends SavedGame {
   continuePractice: () => void;
   newGame: (difficulty: Difficulty, restart?: boolean) => void;
   startPuzzle: (puzzleId: string) => void;
+  switchGame: (slot: string) => void;
   toggleTheme: () => void;
   toggleSound: () => void;
   checkpoint: () => void;
@@ -78,6 +80,7 @@ export function createGameStore(storage: StateStorage = indexedDbStorage, now = 
     return {
       ...fresh(nextPuzzle('medium')),
       results: [],
+      savedGames: {},
       theme: 'light', soundEnabled: true,
       hydrated: false, storageError: null, recoveryNeeded: false, announcement: '', conflictEvent: 0,
       select: position => {
@@ -140,16 +143,32 @@ export function createGameStore(storage: StateStorage = indexedDbStorage, now = 
       },
       newGame: (difficulty, restart = false) => {
         if (!get().hydrated || get().recoveryNeeded) return;
+        if (isDaily(get().session.puzzleId) && !restart) return;
         const p = restart ? getPuzzle(get().session.puzzleId) : nextPuzzle(difficulty, get().session.puzzleId);
         get().startPuzzle(p.id);
       },
       startPuzzle: puzzleId => {
         if (!get().hydrated || get().recoveryNeeded) return;
         const p = getPuzzle(puzzleId);
+        if (isDaily(puzzleId) && puzzleId !== get().session.puzzleId) return;
+        if (!isDaily(puzzleId) && isDaily(get().session.puzzleId)) get().switchGame('classic');
         const state = get();
         const previous = { ...state.session, elapsedSeconds: checkpointTime() };
         const results = previous.status === 'completed' ? state.results : recordResult(state.results, previous, 'abandoned', Math.max(wallNow(), previous.startedAt ?? 0));
         anchor = now(); set({ ...fresh(p), results, announcement: 'A fresh page. Enjoy your puzzle.', conflictEvent: 0 });
+      },
+      switchGame: slot => {
+        const state = get();
+        if (!state.hydrated || state.recoveryNeeded || slot === gameSlot(state.session.puzzleId)) return;
+        const puzzle = slot === 'classic' ? nextPuzzle('medium') : dailyPuzzle(slot.slice(6));
+        if (slot !== 'classic' && (slot !== puzzle.id || (!state.savedGames[slot] && slot.slice(6) > localDate(new Date(wallNow()))))) throw new Error('Daily edition is not available yet');
+        const { board, selected, notesMode, history } = state;
+        const session = { ...state.session, elapsedSeconds: checkpointTime(), status: state.session.status === 'playing' ? 'paused' as const : state.session.status };
+        const savedGames = { ...state.savedGames, [gameSlot(session.puzzleId)]: { board, selected, notesMode, history, session } };
+        const target = savedGames[slot] ?? fresh(puzzle);
+        delete savedGames[slot];
+        anchor = target.session.status === 'playing' ? now() : null;
+        set({ ...target, savedGames, conflictEvent: 0, announcement: 'Your edition is ready.' });
       },
       toggleTheme: () => { if (get().hydrated && !get().recoveryNeeded) set({ theme: get().theme === 'light' ? 'dark' : 'light' }); },
       toggleSound: () => { if (!get().hydrated || get().recoveryNeeded) return; const enabled = !get().soundEnabled; audio.setMuted(!enabled); set({ soundEnabled: enabled }); if (enabled) play('tap'); },
@@ -161,13 +180,13 @@ export function createGameStore(storage: StateStorage = indexedDbStorage, now = 
       },
       displayedSeconds: seconds,
       recover: () => {
-        anchor = now(); set({ ...fresh(nextPuzzle('medium')), recoveryNeeded: false, storageError: null, announcement: 'A fresh puzzle is ready.' });
+        anchor = now(); set({ ...fresh(nextPuzzle('medium')), savedGames: {}, results: [], recoveryNeeded: false, storageError: null, announcement: 'A fresh puzzle is ready.' });
       },
     };
   }, {
-    name: 'editorial-sudoku-session', version: 2, skipHydration: true,
+    name: 'editorial-sudoku-session', version: 3, skipHydration: true,
     storage: createJSONStorage(() => storage),
-    partialize: s => ({ board: s.board, selected: s.selected, notesMode: s.notesMode, history: s.history, session: s.session, results: s.results, theme: s.theme, soundEnabled: s.soundEnabled }),
+    partialize: s => ({ board: s.board, selected: s.selected, notesMode: s.notesMode, history: s.history, session: s.session, results: s.results, savedGames: s.savedGames, theme: s.theme, soundEnabled: s.soundEnabled }),
     migrate: migrateSave,
     merge: (persisted, current) => {
       if (!persisted) return current;

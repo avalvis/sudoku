@@ -39,7 +39,7 @@ try {
       r.onsuccess = () => resolve(JSON.parse(r.result)); r.onerror = () => reject(r.error); tx.oncomplete = () => db.close();
     });
   });
-  expect(save.version).toBe(2);
+  expect(save.version).toBe(3);
   expect(save.state.results).toHaveLength(1);
   expect(save.state.results[0].id).toBe(save.state.session.id);
   expect(errors).toEqual([]);

@@ -91,7 +91,7 @@ test('a v1 save migrates in the browser with notes, undo, and elapsed time intac
   await expect(page.getByTestId('timer')).toHaveText('01:13');
   await page.keyboard.press('Control+z'); await expect(page.getByTestId('cell-0-0')).toHaveAttribute('aria-label', /notes 2$/);
   await goStats(page); await expect(page.getByText('of 1 started attempt', { exact: true })).toBeVisible();
-  const saved = JSON.parse(await readSave(page)); expect(saved.version).toBe(2); expect(saved.state.session.startedAt).toBe(null);
+  const saved = JSON.parse(await readSave(page)); expect(saved.version).toBe(3); expect(saved.state.session.startedAt).toBe(null);
 });
 
 for (const width of [900, 1280, 1920]) {
