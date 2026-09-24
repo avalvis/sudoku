@@ -6,15 +6,15 @@ A desktop-first, offline Sudoku application inspired by newspaper puzzle pages. 
 
 **Classic — dark theme**
 
-![Classic Sudoku board with the number keypad and game controls in dark mode](assets/sudoku_DF66QCj6RB.png)
+![Classic Sudoku board with the number keypad and game controls in dark mode](docs/screenshots/classic-dark.png)
 
 **Daily — light theme**
 
-![Daily Sudoku puzzle with an edition date selector in light mode](assets/sudoku_Bi6B2P4aku.png)
+![Daily Sudoku puzzle with an edition date selector in light mode](docs/screenshots/daily-light.png)
 
 **Puzzle archive**
 
-![Puzzle archive with difficulty filters, rated puzzles, and board previews](assets/sudoku_BNTUJ8M1pt.png)
+![Puzzle archive with difficulty filters, rated puzzles, and board previews](docs/screenshots/archive-dark.png)
 
 ## Run locally
 
