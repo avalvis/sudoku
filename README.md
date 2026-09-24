@@ -2,6 +2,20 @@
 
 A desktop-first, offline Sudoku application inspired by newspaper puzzle pages. Built with React 19, TypeScript, Vite, Tailwind CSS v4, Zustand, Motion, and Tauri v2 for Windows/WebView2.
 
+## Screenshots
+
+**Classic — dark theme**
+
+![Classic Sudoku board with the number keypad and game controls in dark mode](assets/sudoku_DF66QCj6RB.png)
+
+**Daily — light theme**
+
+![Daily Sudoku puzzle with an edition date selector in light mode](assets/sudoku_Bi6B2P4aku.png)
+
+**Puzzle archive**
+
+![Puzzle archive with difficulty filters, rated puzzles, and board previews](assets/sudoku_BNTUJ8M1pt.png)
+
 ## Run locally
 
 Use Node.js 24 or newer and npm. For native development, also install the stable Rust MSVC toolchain, Visual Studio C++ Build Tools with a Windows SDK, and WebView2. Building MSI packages requires the Windows VBSCRIPT optional feature. See [Tauri's prerequisites](https://v2.tauri.app/start/prerequisites/).
