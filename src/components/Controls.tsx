@@ -72,7 +72,12 @@ export function GameControlPanel({ onNewGame, onRestart, onDifficulty }: { onNew
     <NumberKeypad />
     <div className="progress-detail"><div><span>{filled} of 81 filled</span><span>{Math.round(filled / 81 * 100)}%</span></div><progress value={filled} max={81} aria-label="Filled cells" /></div>
     {!daily && <button className="new-game-button" onClick={onNewGame}>New puzzle <ArrowUpRight size={17} /></button>}
-    <button className="restart-button" onClick={onRestart}><RotateCcw size={12} /> Restart</button>
-    <div className="keyboard-help"><span className="micro-label">Keyboard</span><p><kbd>1–9</kbd> to enter <span>·</span> <kbd>N</kbd> for notes</p><p><kbd>↑ ↓ ← →</kbd> to move <span>·</span> <kbd>Ctrl Z</kbd> to undo</p></div>
+    <button className="restart-button" onClick={onRestart}><RotateCcw size={13} aria-hidden="true" /> Restart puzzle</button>
+    <div className="keyboard-help" aria-label="Keyboard shortcuts"><div className="shortcut-heading"><span className="micro-label">Keyboard</span><span aria-hidden="true" /></div><dl className="shortcut-list">
+      <div><dt><kbd>1–9</kbd></dt><dd>Enter</dd></div>
+      <div><dt><kbd>N</kbd></dt><dd>Notes</dd></div>
+      <div><dt><kbd aria-label="Arrow keys">↑ ↓ ← →</kbd></dt><dd>Move</dd></div>
+      <div><dt><kbd>Ctrl Z</kbd></dt><dd>Undo</dd></div>
+    </dl></div>
   </aside>;
 }

@@ -3,7 +3,7 @@ import graded from '../src/domain/graded-pack.json' with { type: 'json' };
 
 test('opens and completes a technique-graded Hard puzzle from Archive', async ({ page }) => {
   await page.goto('/#archive');
-  await page.getByRole('checkbox', { name: 'Technique graded' }).check();
+  await page.getByRole('checkbox', { name: 'Rated puzzles only' }).check();
   await expect(page.getByRole('article')).toHaveCount(9);
   await page.getByRole('combobox').selectOption('hard');
   await expect(page.getByRole('article')).toHaveCount(9);

@@ -218,13 +218,17 @@ h1 { margin: 6px 0 0; font-family: var(--font-editorial); font-weight: 500; font
 .progress-detail progress::-moz-progress-bar { background: var(--accent); }
 .new-game-button { margin-top: 22px; height: 40px; display: flex; align-items: center; justify-content: space-between; width: 100%; padding: 0 12px; color: var(--accent); background: transparent; border: 1px solid var(--accent); border-radius: 4px; font-size: 11px; font-weight: 500; }
 .new-game-button:hover { background: var(--cell-selected); }
-.restart-button { margin: 11px auto 0; display: flex; gap: 5px; align-items: center; border: 0; background: transparent; color: var(--muted); font-size: 9px; padding: 4px; }
-.restart-button:hover { color: var(--accent); }
+.restart-button { margin: 11px auto 0; display: flex; gap: 7px; align-items: center; justify-content: center; border: 1px solid transparent; border-radius: 3px; background: transparent; color: var(--secondary); font-size: 10px; padding: 5px 10px; }
+.restart-button:hover { color: var(--accent); border-color: var(--stroke); background: var(--surface); }
 .keyboard-help { margin-top: 23px; padding-top: 17px; border-top: 1px solid var(--stroke); }
 .keyboard-help .micro-label { font-size: 8px; letter-spacing: 1px; }
-.keyboard-help p { font-size: 9px; margin: 8px 0 0; color: var(--muted); }
-.keyboard-help kbd { font: inherit; color: var(--secondary); }
-.keyboard-help p > span { padding: 0 5px; }
+.shortcut-heading { display: flex; gap: 10px; align-items: center; color: var(--secondary); }
+.shortcut-heading > span:last-child { width: 18px; height: 2px; background: var(--accent); }
+.shortcut-list { display: grid; grid-template-columns: 1fr 1fr; gap: 7px 12px; margin: 9px 0 0; }
+.shortcut-list > div { display: flex; align-items: center; gap: 8px; }
+.shortcut-list dt, .shortcut-list dd { margin: 0; }
+.shortcut-list dd { font-size: 10px; color: var(--secondary); }
+.keyboard-help kbd { display: inline-flex; align-items: center; justify-content: center; min-width: 44px; height: 21px; padding: 0 5px; border: 1px solid var(--stroke); border-bottom-width: 2px; border-radius: 3px; background: var(--surface); font: 10px var(--font-mechanical); color: var(--ink); white-space: nowrap; }
 .edition-footer { display: flex; justify-content: space-between; border-top: 1px solid var(--stroke); margin-top: 25px; padding-top: 13px; color: var(--muted); font-size: 9px; letter-spacing: .1px; }
 .edition-footer > span:first-child { font-family: var(--font-editorial); font-size: 10px; }
 .editorial-dialog { position: fixed; margin: auto; width: min(460px, calc(100vw - 48px)); padding: 36px; color: var(--ink); background: var(--paper); border: 1px solid var(--rule); border-radius: 4px; max-height: calc(100dvh - 48px); overflow-y: auto; }
@@ -279,7 +283,6 @@ h1 { margin: 6px 0 0; font-family: var(--font-editorial); font-weight: 500; font
 .restart-button { margin-top: 7px; font-size: 10px; }
 .keyboard-help { margin-top: 14px; padding-top: 10px; }
 .keyboard-help .micro-label { font-size: 9px; }
-.keyboard-help p { font-size: 10px; margin-top: 5px; }
 .edition-footer { font-size: 10px; }
 
 @media (max-width: 1099px) {
@@ -300,7 +303,7 @@ h1 { margin: 6px 0 0; font-family: var(--font-editorial); font-weight: 500; font
   .new-game-button { margin-top: 20px; }
   .restart-button { margin-top: 20px; }
   .keyboard-help { grid-column: 1 / -1; }
-  .keyboard-help p { display: inline-block; margin-right: 18px; }
+  .shortcut-list { grid-template-columns: repeat(4, max-content); column-gap: 24px; }
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transition-duration: 0s !important; animation-duration: 0s !important; scroll-behavior: auto !important; }
@@ -408,6 +411,10 @@ h1 { margin: 6px 0 0; font-family: var(--font-editorial); font-weight: 500; font
   .new-game-button { height: 36px; margin-top: 10px; }
   .keyboard-help { margin-top: 8px; padding-top: 7px; }
   .keyboard-help .micro-label { display: none; }
+  .shortcut-heading { display: none; }
+  .restart-button { margin-top: 4px; padding-block: 2px; }
+  .shortcut-list { margin-top: 0; gap: 2px 12px; }
+  .keyboard-help kbd { height: 18px; }
   .daily-edition-bar { margin-bottom: 12px; padding-block: 6px; }
 }
 @media (max-width: 1099px) {

@@ -22,3 +22,6 @@
 .archive-search { display: flex; align-items: center; gap: 12px; margin: 16px 0; font-size: 12px; color: var(--ink); }
 .archive-search input { width: 180px; min-height: 40px; padding: 8px 12px; border: 1px solid var(--rule); border-radius: 3px; background: var(--surface); color: var(--ink); }
 .archive-return { margin-bottom: 16px; }
+.rated-filter { position: relative; }
+.rated-tooltip { position: absolute; z-index: 5; top: calc(100% + 8px); left: 0; width: 260px; padding: 10px 12px; border: 1px solid var(--stroke); border-left: 2px solid var(--accent); border-radius: 3px; background: var(--surface); color: var(--ink); font-size: 12px; font-weight: 400; line-height: 1.5; pointer-events: none; visibility: hidden; }
+.rated-filter:hover .rated-tooltip, .rated-filter:focus-within .rated-tooltip { visibility: visible; }

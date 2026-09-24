@@ -17,7 +17,7 @@ try {
   if (await resume.isVisible()) await resume.click();
   if (!process.argv.includes('--restore')) {
     await page.getByRole('link', { name: 'Archive', exact: true }).click();
-    await page.getByRole('checkbox', { name: 'Technique graded' }).check();
+    await page.getByRole('checkbox', { name: 'Rated puzzles only' }).check();
     await expect(page.getByRole('article')).toHaveCount(9);
     await page.getByRole('combobox').selectOption('hard');
 
@@ -30,7 +30,7 @@ try {
   await expect(page.getByText(/No. 043/)).toBeVisible();
   await expect(page.getByRole('gridcell', { name: /notes 2/ })).toBeVisible();
   await page.getByRole('link', { name: 'Archive', exact: true }).click();
-  await page.getByRole('checkbox', { name: 'Technique graded' }).check();
+  await page.getByRole('checkbox', { name: 'Rated puzzles only' }).check();
   await page.getByRole('combobox').selectOption('hard');
 
   await page.getByRole('searchbox', { name: 'Find puzzle number' }).fill('43');

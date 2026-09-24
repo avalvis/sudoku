@@ -1,6 +1,6 @@
 [package]
 name = "sudoku"
-version = "0.10.0"
+version = "0.10.1"
 description = "Offline Sudoku with Classic and Daily puzzles"
 authors = ["Antonis Valvis"]
 homepage = "https://www.avalvis.gr"
