@@ -24,6 +24,7 @@ export interface GameStore extends SavedGame {
   resume: () => void;
   continuePractice: () => void;
   newGame: (difficulty: Difficulty, restart?: boolean) => void;
+  startPuzzle: (puzzleId: string) => void;
   toggleTheme: () => void;
   toggleSound: () => void;
   checkpoint: () => void;
@@ -140,6 +141,11 @@ export function createGameStore(storage: StateStorage = indexedDbStorage, now = 
       newGame: (difficulty, restart = false) => {
         if (!get().hydrated || get().recoveryNeeded) return;
         const p = restart ? getPuzzle(get().session.puzzleId) : nextPuzzle(difficulty, get().session.puzzleId);
+        get().startPuzzle(p.id);
+      },
+      startPuzzle: puzzleId => {
+        if (!get().hydrated || get().recoveryNeeded) return;
+        const p = getPuzzle(puzzleId);
         const state = get();
         const previous = { ...state.session, elapsedSeconds: checkpointTime() };
         const results = previous.status === 'completed' ? state.results : recordResult(state.results, previous, 'abandoned', Math.max(wallNow(), previous.startedAt ?? 0));

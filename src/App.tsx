@@ -8,6 +8,7 @@ import { DialogHost, type RequestedDialog } from './components/DialogHost';
 import { useGameLifecycle } from './hooks/use-game-lifecycle';
 import { puzzles } from './domain/puzzles';
 import { StatsPage } from './components/StatsPage';
+import { ArchivePage } from './components/ArchivePage';
 
 const tabs = ['Daily', 'Classic', 'Stats', 'Archive'] as const;
 const readRoute = () => { const route = location.hash.slice(1).toLowerCase(); return tabs.find(t => t.toLowerCase() === route) ?? 'Classic'; };
@@ -34,9 +35,8 @@ function ClassicWorkspace({ open }: { open: (dialog: RequestedDialog) => void })
   </main>;
 }
 
-function FutureFeaturePage({ route }: { route: string }) {
-  const copy: Record<string, string> = { Daily: 'A fresh puzzle for every morning. Our daily edition is still on the drawing board.', Archive: 'Good puzzles deserve another look. The archive will open in a future edition.' };
-  return <main id="main-content" tabIndex={-1} className="future-page"><BookOpen size={38} strokeWidth={1.2} /><span className="eyebrow">Coming in a future edition</span><h1>{route === 'Daily' ? 'Tomorrow’s ritual.' : 'Pages worth keeping.'}</h1><p>{copy[route]}</p><a className="primary-button" href="#classic">Return to Classic <ArrowRight size={16} /></a></main>;
+function FutureFeaturePage() {
+  return <main id="main-content" tabIndex={-1} className="future-page"><BookOpen size={38} strokeWidth={1.2} /><span className="eyebrow">Coming in a future edition</span><h1>Tomorrow’s ritual.</h1><p>A fresh puzzle for every morning. Our daily edition is still on the drawing board.</p><a className="primary-button" href="#classic">Return to Classic <ArrowRight size={16} /></a></main>;
 }
 
 export default function App() {
@@ -51,7 +51,7 @@ export default function App() {
   return <MotionConfig reducedMotion="user"><a className="skip-link" href="#main-content" onClick={event => { event.preventDefault(); document.getElementById('main-content')?.focus(); }}>Skip to content</a>
     <AppHeader route={route} />
     {storageError && <div className="storage-notice" role="alert">{storageError}</div>}
-    {!hydrated ? <main className="loading-page"><span className="eyebrow">Opening your edition…</span></main> : route === 'Classic' ? <ClassicWorkspace open={setDialog} /> : route === 'Stats' ? <StatsPage /> : <FutureFeaturePage route={route} />}
+    {!hydrated ? <main className="loading-page"><span className="eyebrow">Opening your edition…</span></main> : route === 'Classic' ? <ClassicWorkspace open={setDialog} /> : route === 'Stats' ? <StatsPage /> : route === 'Archive' ? <ArchivePage /> : <FutureFeaturePage />}
     <div className="sr-only" role="status" aria-live="polite">{announcement}</div>
     {hydrated && <DialogHost key={dialog ?? 'session'} requested={dialog} close={() => setDialog(null)} classic={route === 'Classic'} />}
   </MotionConfig>;

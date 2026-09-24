@@ -2,9 +2,12 @@
 
 ## Passed
 
+- Version 0.3.0 production frontend and both Windows installers built successfully. Native Archive smoke tests passed before and after process restart: exact puzzle selection, pencil notes, current-board return, no false abandoned results, and no runtime errors. Tests used an isolated WebView2 profile. Installation/uninstallation was not repeated for 0.3.0.
+
 - `npm run lint` and `npm run typecheck`.
-- `npm test`: 41 unit/component tests, including journal accounting, result validation, filters, pagination, and version-1 migration.
-- `npm run test:e2e`: 23 browser tests, including gameplay completion, unlimited board Undo, hints, mistake-limit/practice transitions, session restoration, corrupt-save recovery, unavailable storage/audio, offline input, numpad input, and dark number contrast of at least 7:1. Stats coverage includes completion idempotence across reloads, abandonment confirmation, Practice separation, and real IndexedDB migration preserving notes, Undo, and elapsed time.
+- 44 unit/component tests passed: the existing 41-test suite plus three Archive store tests for exact puzzle selection, atomic replacement, and hydration/recovery guards.
+- `npm run test:e2e`: 28 browser tests, including gameplay completion, unlimited board Undo, hints, mistake-limit/practice transitions, session restoration, corrupt-save recovery, unavailable storage/audio, offline input, numpad input, and dark number contrast of at least 7:1. Stats coverage includes completion idempotence across reloads, abandonment confirmation, Practice separation, and real IndexedDB migration preserving notes, Undo, and elapsed time. Archive coverage includes filters, cancellation and focus restoration, exact puzzle selection, persistence, replay, and current-board return.
+- Archive layouts checked at 900, 1280, and 1920 pixels in both themes; screenshots inspected at 900 and 1280 pixels.
 - Stats layouts inspected at 900, 1280, and 1920 pixels in both themes; no horizontal overflow.
 - Desktop layouts inspected in both themes at 900×700, 1280×900, 1440×900, 1920×1080, and 2560×1080. Browser device-scale checks passed at 125%, 150%, and 200%.
 - A follow-up five-layout run passed after fixing the dark page background below short content.

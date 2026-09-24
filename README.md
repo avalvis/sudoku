@@ -73,6 +73,10 @@ An attempt starts on the first effective board change, including a note or hint.
 
 Web Audio creates its context only after a user gesture. Sounds use short oscillator/gain envelopes, disconnect finished nodes, and fail harmlessly if audio is unavailable. Audio objects never enter persisted state.
 
+## Archive
+
+The Archive browses all nine bundled puzzles with board previews, difficulty filters, and a not-yet-completed filter. Cards show completion counts (including Practice) and the best normal-game time. Returning to the current board preserves its progress; starting another puzzle or replay requires confirmation. Replays have new attempt IDs and retain all prior journal entries. The Archive shares the Classic engine and version-2 save format.
+
 ## Desktop design
 
 The source references in `assets/stitch/` are preserved. Their visual language is adapted to desktop: top navigation, a centered square board, a 280px control panel, and a 3×3 keypad. Below 1100 CSS pixels, controls stack beneath the board with a horizontal keypad. The native window starts at 1280×900 with a 900×700 minimum. Short windows scroll rather than clipping controls.
@@ -85,7 +89,7 @@ Reference conflicts were resolved in favor of the approved plan: four utility ac
 
 The included nine original fixtures are reproducibly authored by `scripts/create-puzzle-pack.mjs`, with 43/33/26 givens for Easy/Medium/Hard. Each is tested for a unique solution matching its stored solution. These initial difficulty labels use clue density; they are not a formal human-technique difficulty rating. The authoring script is not included in the app bundle.
 
-Daily and Archive are explicitly labeled future editions. Runtime puzzle generation, formally graded puzzle packs, cloud synchronization, a daily calendar, automatic updates, signing, and Android are deferred. The game engine and persisted model do not depend on the desktop layout.
+Daily is explicitly labeled a future edition. Runtime puzzle generation, formally graded puzzle packs, cloud synchronization, a daily calendar, automatic updates, signing, and Android are deferred. The game engine and persisted model do not depend on the desktop layout.
 
 ## Test coverage
 
@@ -96,3 +100,5 @@ Layout checks cover 900×700, 1280×900, 1440×900, 1920×1080, and 2560×1080 i
 `scripts/native-smoke.mjs` connects to a test-launched WebView2 on localhost port 9237 to verify native gameplay; `--restore` checks saved notes and Undo after relaunch. Run it only against an isolated test profile, using `WEBVIEW2_USER_DATA_FOLDER` and `WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS=--remote-debugging-port=9237`. The shipping application does not enable remote debugging.
 
 `scripts/native-stats-smoke.mjs` completes a puzzle and checks its persisted journal entry in native WebView2. Relaunch the app with the same isolated profile and run with `--restore` to check that exactly one result survives the process restart.
+
+`scripts/native-archive-smoke.mjs` opens a specific Archive puzzle, adds a note, and verifies return-to-board behavior; `--restore` checks that selection and notes survive native relaunch. Use a new isolated profile for its first run.
