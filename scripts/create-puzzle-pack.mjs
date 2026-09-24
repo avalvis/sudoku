@@ -1,0 +1,54 @@
+// Build-time fixture authoring only. No puzzle generation ships in the application.
+import { writeFileSync } from 'node:fs';
+let seed = 142;
+const random = () => { seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0; return seed / 4294967296; };
+const shuffle = a => { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const range = n => Array.from({ length: n }, (_, i) => i);
+function countSolutions(input) {
+  const cells = input.flat().map(v => v ?? 0);
+  let count = 0;
+  function visit() {
+    if (count >= 2) return;
+    let spot = -1, candidates = [];
+    for (let i = 0; i < 81; i++) {
+      if (cells[i]) continue;
+      const r = Math.floor(i / 9), c = i % 9;
+      const used = new Set();
+      for (let n = 0; n < 9; n++) {
+        used.add(cells[r * 9 + n]); used.add(cells[n * 9 + c]);
+        used.add(cells[(Math.floor(r / 3) * 3 + Math.floor(n / 3)) * 9 + Math.floor(c / 3) * 3 + n % 3]);
+      }
+      const options = range(9).map(n => n + 1).filter(n => !used.has(n));
+      if (!options.length) return;
+      if (spot < 0 || options.length < candidates.length) { spot = i; candidates = options; }
+    }
+    if (spot < 0) { count++; return; }
+    for (const value of candidates) { cells[spot] = value; visit(); cells[spot] = 0; if (count >= 2) return; }
+  }
+  visit(); return count;
+}
+const puzzles = [];
+for (const [difficulty, clues] of [['easy', 43], ['medium', 33], ['hard', 26]]) {
+  for (let index = 0; index < 3; index++) {
+    let puzzle;
+    do {
+      const digits = shuffle(range(9).map(n => n + 1));
+      const rows = shuffle(range(3)).flatMap(b => shuffle(range(3)).map(r => b * 3 + r));
+      const cols = shuffle(range(3)).flatMap(b => shuffle(range(3)).map(c => b * 3 + c));
+      const solution = rows.map(r => cols.map(c => digits[(r * 3 + Math.floor(r / 3) + c) % 9]));
+      const givens = solution.map(row => [...row]);
+      let remaining = 81;
+      for (const i of shuffle(range(81))) {
+        if (remaining === clues) break;
+        const r = Math.floor(i / 9), c = i % 9, before = givens[r][c];
+        givens[r][c] = null;
+        if (countSolutions(givens) !== 1) givens[r][c] = before;
+        else remaining--;
+      }
+      if (remaining === clues) puzzle = { id: `${difficulty}-${index + 1}`, difficulty, givens, solution };
+    } while (!puzzle);
+    puzzles.push(puzzle);
+  }
+}
+writeFileSync(new URL('../src/domain/puzzle-pack.json', import.meta.url), JSON.stringify(puzzles, null, 2) + '\n');
+console.log(`Authored ${puzzles.length} puzzles; all uniquely solvable.`);
