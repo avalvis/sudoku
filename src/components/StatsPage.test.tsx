@@ -14,7 +14,7 @@ it('renders a calm empty state and undefined rate/time records', () => {
   expect(screen.getByTestId('stats-completed')).toHaveTextContent('0');
   expect(screen.getByTestId('stats-rate')).toHaveTextContent('—');
   expect(screen.getByTestId('stats-best')).toHaveTextContent('—');
-  expect(screen.getByText('Your next chapter is unwritten.')).toBeVisible();
+  expect(screen.getByText('No games yet.')).toBeVisible();
 });
 it('filters summary, difficulty rows, and history together without mixing practice', () => {
   useGame.setState({ results: [result('one'), result('two', { difficulty: 'hard', elapsedSeconds: 240 }), result('three', { practice: true, elapsedSeconds: 15 })] });

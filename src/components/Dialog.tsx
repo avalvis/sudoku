@@ -11,7 +11,7 @@ export function Dialog({ title, eyebrow, children, onClose }: { title: string; e
   }, []);
   return <dialog ref={ref} className="editorial-dialog" aria-labelledby="dialog-title" onCancel={e => { e.preventDefault(); onClose?.(); }}>
     {onClose && <button className="dialog-close icon-button" aria-label="Close dialog" onClick={onClose}><X size={19} /></button>}
-    <span className="eyebrow">{eyebrow}</span>
+    {eyebrow && <span className="eyebrow">{eyebrow}</span>}
     <h2 id="dialog-title">{title}</h2>
     {children}
   </dialog>;

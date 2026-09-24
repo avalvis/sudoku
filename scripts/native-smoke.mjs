@@ -14,8 +14,10 @@ try {
   const errors = [];
   page.on('pageerror', e => errors.push(e.message));
   await page.waitForURL(/tauri\.localhost/);
+  await expect(page.getByTestId('opening')).toHaveCount(0);
+  await expect(page.locator('#main-content')).toBeVisible();
   await expect(page.locator('[role="gridcell"]')).toHaveCount(81);
-  const resume = page.getByRole('button', { name: 'Back to the puzzle' });
+  const resume = page.getByRole('button', { name: 'Resume' });
   if (await resume.isVisible()) await resume.click();
   if (process.argv.includes('--restore')) {
     await expect(page.getByTestId('cell-0-0')).toHaveAttribute('aria-label', /notes 2, 4/);
@@ -34,7 +36,7 @@ try {
     mkdirSync('test-results', { recursive: true });
     await page.screenshot({ path: 'test-results/native-desktop.png', fullPage: true });
     await page.getByRole('button', { name: 'Pause game' }).click();
-    await expect(page.getByRole('dialog')).toContainText('Take your time.');
+    await expect(page.getByRole('dialog')).toContainText('Paused');
     console.log('Native WebView2: bundled fonts, board, keyboard, notes, theme, and pause verified.');
   }
   expect(errors).toEqual([]);

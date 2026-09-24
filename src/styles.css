@@ -352,3 +352,54 @@ h1 { margin: 6px 0 0; font-family: var(--font-editorial); font-weight: 500; font
   .stat-card { padding: 20px 15px; }
   .stat-card .eyebrow { font-size: 9px; letter-spacing: 1px; }
 }
+
+/* Compact desktop chrome; board size reserves space for all visible controls. */
+.app-header { height: 64px; }
+.brand-name { font-size: 25px; letter-spacing: -.6px; }
+.main-content { --board-size: min(720px, max(360px, calc(100dvh - 190px))); padding: 20px 24px; }
+.main-content.daily-game { --board-size: min(720px, max(360px, calc(100dvh - 270px))); }
+.page-heading { margin-bottom: 16px; min-height: 34px; }
+.page-heading h1 { font-size: 28px; margin: 0; letter-spacing: -.6px; }
+.board-caption { margin-top: 10px; }
+.daily-edition-bar { display: flex; align-items: center; gap: 16px; justify-content: space-between; padding: 8px 0; margin: 0 auto 16px; }
+.daily-date-controls { gap: 10px; }
+.daily-date-controls label { gap: 8px; }
+.daily-edition-bar p { margin: 0; white-space: nowrap; }
+.stats-page { padding-top: 24px; }
+.stats-heading { margin-bottom: 20px; }
+.stats-heading h1 { margin: 0; font-size: 30px; }
+.stats-section { margin-top: 24px; }
+.stats-footnote { margin-top: 24px; font-size: 12px; }
+.stats-footnote summary { cursor: pointer; }
+.stats-footnote p { margin-top: 10px; }
+.opening { min-height: 100dvh; display: grid; place-items: center; position: relative; background: var(--paper); }
+.opening-content { text-align: center; animation: opening-in 450ms ease-out both; }
+.opening-content img { margin: auto auto 20px; }
+.opening-content h1 { font-size: 38px; margin: 0; }
+.opening-content p { margin: 18px 0 0; font-size: 13px; color: var(--secondary); }
+.opening-content strong { display: block; font-weight: 500; font-size: 16px; color: var(--ink); margin-top: 5px; }
+.opening-skip { position: absolute; bottom: 24px; right: 32px; padding: 10px 16px; border: 1px solid var(--stroke); border-radius: 4px; background: transparent; color: var(--secondary); font-size: 12px; }
+@keyframes opening-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+@media (min-width: 1100px) and (max-height: 850px) {
+  .app-header { height: 56px; }
+  .main-content { padding-top: 12px; padding-bottom: 12px; --board-size: min(720px, max(360px, calc(100dvh - 160px))); }
+  .main-content.daily-game { --board-size: min(720px, max(360px, calc(100dvh - 230px))); }
+  .page-heading { margin-bottom: 12px; }
+  .control-panel { padding-left: 20px; }
+  .session-meta { margin-top: 10px; }
+  .panel-rule { margin: 10px 0; }
+  .utility { height: 36px; }
+  .utility-actions { gap: 6px; }
+  .keypad-heading { margin-top: 10px; margin-bottom: 6px; }
+  .number-key { height: 42px; }
+  .number-keypad { gap: 4px; }
+  .progress-detail { margin-top: 8px; }
+  .new-game-button { height: 36px; margin-top: 10px; }
+  .keyboard-help { margin-top: 8px; padding-top: 7px; }
+  .keyboard-help .micro-label { display: none; }
+  .daily-edition-bar { margin-bottom: 12px; padding-block: 6px; }
+}
+@media (max-width: 1099px) {
+  .main-content { max-width: 850px; }
+  .daily-edition-bar { flex-wrap: wrap; }
+}

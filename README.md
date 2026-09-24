@@ -1,4 +1,4 @@
-# Editorial Sudoku
+# Sudoku
 
 A desktop-first, offline Sudoku application inspired by newspaper puzzle pages. Built with React 19, TypeScript, Vite, Tailwind CSS v4, Zustand, Motion, and Tauri v2 for Windows/WebView2.
 
@@ -33,7 +33,9 @@ The web build is in `dist/`. Windows installers are generated under:
 
 Both installers include the WebView2 offline installer, which makes them substantially larger than the application executable. The application, fonts, and puzzle pack require no network connection at runtime. Building the installers requires access to npm, crates.io, and the Windows installer downloads. Installers are unsigned development artifacts; code signing and public distribution are not configured.
 
-The Windows CI workflow runs lint, TypeScript, unit/component tests, browser tests, and native packaging, then uploads both installer artifacts. It does not publish releases.
+The Windows CI workflow runs lint, TypeScript, unit/component tests, browser tests, native packaging, and an administrator MSI installation/uninstallation check, then uploads installers and checksums. It does not publish releases. The MSI check can also run from an administrator PowerShell with `./scripts/verify-msi.ps1` on an isolated Windows machine.
+
+Version 0.6.0 uses the name **Sudoku**, publisher **Antonis Valvis**, and website **https://www.avalvis.gr**. Windows 10/11 x64 is the desktop target. Both installers include offline WebView2 provisioning. The internal identifier `dev.editorial.sudoku`, storage key, and MSI upgrade code remain unchanged to preserve existing saves and upgrade identity. The NSIS installer migrates previous Editorial Sudoku installations before installing the renamed application.
 
 ## Gameplay
 
@@ -89,7 +91,9 @@ Version-2 saves migrate to version 3 without changing their board or journal. Ve
 
 ## Desktop design
 
-The source references in `assets/stitch/` are preserved. Their visual language is adapted to desktop: top navigation, a centered square board, a 280px control panel, and a 3×3 keypad. Below 1100 CSS pixels, controls stack beneath the board with a horizontal keypad. The native window starts at 1280×900 with a 900×700 minimum. Short windows scroll rather than clipping controls.
+The source references in `assets/stitch/` are preserved. Their visual language is adapted to desktop: top navigation, a centered square board, a 280px control panel, and a 3×3 keypad. Below 1100 CSS pixels, controls stack beneath the board with a horizontal keypad. The native window starts at 1280×900 with a 900×700 minimum. Board size accounts for available viewport height and the additional Daily controls. Wide gameplay fits without scrolling at tested sizes down to 1280×680 CSS pixels; smaller stacked windows can scroll rather than clipping controls.
+
+The numbered app icon is generated from `public/favicon.svg`. A skippable 1.5-second opening displays “Developed by Antonis Valvis”; reduced motion shortens it and removes movement. The game clock remains stopped during this opening. Headings, controls, and dialogs use concise functional text.
 
 The exact reference color palette is preserved in `src/reference-tokens.css`. Semantic aliases in `src/styles.css` implement the explicit cream/cobalt/ochre requirements and dark-mode contrast. Domine is used for editorial headings; Space Grotesk is used for digits and controls. Fonts and their OFL licenses are bundled locally in the build.
 
@@ -102,6 +106,8 @@ The included nine original fixtures are reproducibly authored by `scripts/create
 Version 0.5.0 adds 27 fixtures in `expanded-pack.json`, reproducibly authored by `node scripts/create-expanded-pack.mjs`. It generates randomized complete grids by backtracking, then removes clues while retaining exactly one solution. There are now 12 puzzles per difficulty. The original nine stay first in the catalog; new entries are appended so edition numbers, IDs, saves, and Daily mappings remain compatible. Daily intentionally continues to use the original pack. Do not reorder or change published fixtures.
 
 Runtime puzzle generation, formally graded puzzle packs, cloud synchronization, daily streaks, automatic updates, signing, and Android are deferred. The game engine and persisted model do not depend on the desktop layout.
+
+Run `node scripts/audit-puzzle-quality.mjs` to regenerate [PUZZLE_QUALITY.md](PUZZLE_QUALITY.md). The bounded logical solver checks singles, locked candidates, and naked pairs without guessing. The current Medium and Hard packs are mostly solvable with singles, so their clue-based labels must not be advertised as professional difficulty ratings. Daily transformations preserve unique solutions, but do not provide independently generated, professionally calibrated daily puzzles. The report documents the gates required before introducing a new generator; published date mappings remain stable.
 
 ## Test coverage
 

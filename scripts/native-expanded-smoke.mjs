@@ -11,7 +11,9 @@ try {
   const page = context.pages()[0] ?? await context.waitForEvent('page');
   const errors = []; page.on('pageerror', error => errors.push(error.message));
   await page.waitForURL(/tauri\.localhost/);
-  const resume = page.getByRole('button', { name: 'Back to the puzzle' });
+  await expect(page.getByTestId('opening')).toHaveCount(0);
+  await expect(page.locator('#main-content')).toBeVisible();
+  const resume = page.getByRole('button', { name: 'Resume' });
   if (await resume.isVisible()) await resume.click();
   if (!process.argv.includes('--restore')) {
     await page.getByRole('link', { name: 'Archive', exact: true }).click();
@@ -31,7 +33,7 @@ try {
   const current = page.getByRole('article', { name: 'Puzzle 036' });
   await expect(current).toContainText('Your puzzle in progress');
   await current.getByRole('link', { name: 'Return to puzzle' }).click();
-  await page.getByRole('button', { name: 'Back to the puzzle' }).click();
+  await page.getByRole('button', { name: 'Resume' }).click();
   await expect(page.getByRole('gridcell', { name: /notes 2/ })).toBeVisible();
   await page.getByRole('button', { name: 'Pause game' }).click();
   const save = await page.evaluate(async () => {

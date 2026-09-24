@@ -5,16 +5,17 @@ const puzzle = puzzles.find(p => p.id === 'medium-1')!;
 async function ready(page: Page) {
   await page.goto('/');
   await expect(page.locator('[role="gridcell"]')).toHaveCount(81);
-  const resume = page.getByRole('button', { name: 'Back to the puzzle' });
+  const resume = page.getByRole('button', { name: 'Resume' });
   if (await resume.isVisible()) await resume.click();
 }
 async function goStats(page: Page) {
   await page.getByRole('link', { name: 'Stats', exact: true }).click();
-  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Progress, in perspective.');
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Stats');
 }
 async function backToPuzzle(page: Page) {
   await page.getByRole('link', { name: 'Classic', exact: true }).click();
-  const resume = page.getByRole('button', { name: 'Back to the puzzle' });
+  await expect(page.getByRole('heading', { name: 'Classic', exact: true })).toBeVisible();
+  const resume = page.getByRole('button', { name: 'Resume' });
   if (await resume.isVisible()) await resume.click();
 }
 async function readSave(page: Page) {
@@ -38,28 +39,28 @@ test('one completed result survives review, new game, route changes, and repeate
   expect(JSON.parse(await readSave(page)).state.results).toEqual(saved.state.results);
   await backToPuzzle(page);
   const review = page.getByRole('button', { name: 'Review board' }); if (await review.isVisible()) await review.click();
-  await page.getByRole('button', { name: 'A new puzzle' }).click(); await page.getByRole('button', { name: 'Start puzzle', exact: true }).click();
+  await page.getByRole('button', { name: 'New puzzle' }).click(); await page.getByRole('button', { name: 'Start puzzle', exact: true }).click();
   await goStats(page); await expect(page.getByTestId('stats-completed')).toHaveText('1'); await expect(page.getByTestId('stats-rate')).toHaveText('100%');
 });
 
 test('cancelled restart preserves the attempt; confirmed replacement records abandonment', async ({ page }) => {
   await ready(page); await page.getByTestId('cell-0-0').click(); await page.keyboard.press('n'); await page.keyboard.press('2');
-  await page.getByRole('button', { name: 'Start this one again' }).click();
+  await page.getByRole('button', { name: 'Restart' }).click();
   await expect(page.getByRole('dialog')).toContainText('saved as abandoned');
-  await page.getByRole('button', { name: 'Keep playing' }).click(); await goStats(page);
+  await page.getByRole('button', { name: 'Cancel' }).click(); await goStats(page);
   await expect(page.getByTestId('stats-completed')).toHaveText('0'); await expect(page.getByText('of 1 started attempt', { exact: true })).toBeVisible();
-  await expect(page.getByText('Your current puzzle is waiting right where you left it.')).toBeVisible();
-  await expect(page.getByText('Your next chapter is unwritten.')).toBeVisible();
-  await backToPuzzle(page); await page.getByRole('button', { name: 'Start this one again' }).click(); await page.getByRole('button', { name: 'Restart puzzle', exact: true }).click();
+  await expect(page.getByText('A puzzle is in progress.')).toBeVisible();
+  await expect(page.getByText('No games yet.')).toBeVisible();
+  await backToPuzzle(page); await page.getByRole('button', { name: 'Restart' }).click(); await page.getByRole('button', { name: 'Restart puzzle', exact: true }).click();
   await goStats(page); await expect(page.getByText('Abandoned', { exact: true })).toBeVisible();
   await expect(page.getByText('of 1 started attempt', { exact: true })).toBeVisible();
-  await expect(page.getByText('Your current puzzle is waiting right where you left it.')).not.toBeVisible();
+  await expect(page.getByText('A puzzle is in progress.')).not.toBeVisible();
   await page.reload(); await expect(page.getByText('Abandoned', { exact: true })).toBeVisible();
 });
 
 test('practice history is separate and filters persist across theme changes', async ({ page }) => {
   await ready(page); await page.getByTestId('cell-0-0').click(); for (const digit of ['6', '8', '1']) await page.keyboard.press(digit);
-  await page.getByRole('button', { name: 'Continue practice' }).click(); await page.getByRole('button', { name: 'Start this one again' }).click();
+  await page.getByRole('button', { name: 'Continue practice' }).click(); await page.getByRole('button', { name: 'Restart' }).click();
   await page.getByRole('button', { name: 'Restart puzzle', exact: true }).click(); await goStats(page);
   await expect(page.getByText('of 0 started attempts', { exact: true })).toBeVisible();
   await page.getByRole('button', { name: 'Practice games', exact: true }).click();
@@ -86,7 +87,7 @@ test('a v1 save migrates in the browser with notes, undo, and elapsed time intac
       tx.oncomplete = () => resolve(); tx.onerror = () => reject(tx.error);
     }); db.close();
   });
-  await page.reload(); await page.getByRole('button', { name: 'Back to the puzzle' }).click();
+  await page.reload(); await page.getByRole('button', { name: 'Resume' }).click();
   await expect(page.getByTestId('cell-0-0')).toHaveAttribute('aria-label', /notes 2, 4/);
   await expect(page.getByTestId('timer')).toHaveText('01:13');
   await page.keyboard.press('Control+z'); await expect(page.getByTestId('cell-0-0')).toHaveAttribute('aria-label', /notes 2$/);

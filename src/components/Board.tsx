@@ -44,11 +44,11 @@ export const SudokuBoard = memo(function SudokuBoard() {
           })}
         </div>)}
       </div>
-      {obscured && <div className="board-cover" aria-hidden="true"><Feather size={36} /><span>A moment of quiet.</span></div>}
+      {obscured && <div className="board-cover" aria-hidden="true"><Feather size={36} /><span>Paused</span></div>}
     </div>
     <div className="board-caption">
       <span><Feather size={14} className="ochre" /> Row {selected.row + 1}<span className="caption-dot">·</span>Column {selected.col + 1}</span>
-      <span>{status === 'completed' ? <><Check size={13} /> Complete</> : board[selected.row][selected.col].given ? <><LockKeyhole size={12} /> Printed number</> : 'Make your mark.'}</span>
+      <span>{status === 'completed' ? <><Check size={13} /> Complete</> : board[selected.row][selected.col].given ? <><LockKeyhole size={12} /> Printed number</> : ''}</span>
     </div>
   </div>;
 });

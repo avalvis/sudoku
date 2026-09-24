@@ -61,7 +61,6 @@ export function GameControlPanel({ onNewGame, onRestart, onDifficulty }: { onNew
   const filled = useGame(s => s.board.flat().filter(c => c.value !== null).length);
   const pause = useGame(s => s.pause);
   return <aside className="control-panel" aria-label="Game controls">
-    <div className="session-heading"><span className="eyebrow">Your session</span><span className="edition-mark">№ 01</span></div>
     {daily ? <div className="difficulty-selector" aria-label={`Daily difficulty: ${difficulty}`}><span><i className={`difficulty-dot ${difficulty}`} />{difficulty}</span><span className="micro-label">Daily</span></div> : <button className="difficulty-selector" onClick={onDifficulty} aria-label={`Change difficulty, currently ${difficulty}`}><span><i className={`difficulty-dot ${difficulty}`} />{difficulty}</span><ChevronDown size={17} /></button>}
     <div className="session-meta">
       <div><span className="micro-label">Time elapsed</span><div className="timer-row"><Timer /><button className="pause-button" aria-label="Pause game" title="Pause game" onClick={pause} disabled={!playing}><Pause size={15} /></button></div></div>
@@ -69,11 +68,11 @@ export function GameControlPanel({ onNewGame, onRestart, onDifficulty }: { onNew
     </div>
     <div className="panel-rule" />
     <UtilityActions />
-    <div className="keypad-heading"><span className="micro-label">A number at a time</span><span title="Small numbers show remaining occurrences"><CircleHelp size={13} aria-label="Counters show remaining occurrences" /></span></div>
+    <div className="keypad-heading"><span className="micro-label">Numbers</span><span title="Small numbers show remaining occurrences"><CircleHelp size={13} aria-label="Counters show remaining occurrences" /></span></div>
     <NumberKeypad />
     <div className="progress-detail"><div><span>{filled} of 81 filled</span><span>{Math.round(filled / 81 * 100)}%</span></div><progress value={filled} max={81} aria-label="Filled cells" /></div>
-    {!daily && <button className="new-game-button" onClick={onNewGame}>A new puzzle <ArrowUpRight size={17} /></button>}
-    <button className="restart-button" onClick={onRestart}><RotateCcw size={12} /> Start this one again</button>
-    <div className="keyboard-help"><span className="micro-label">At your fingertips</span><p><kbd>1–9</kbd> to enter <span>·</span> <kbd>N</kbd> for notes</p><p><kbd>↑ ↓ ← →</kbd> to move <span>·</span> <kbd>Ctrl Z</kbd> to undo</p></div>
+    {!daily && <button className="new-game-button" onClick={onNewGame}>New puzzle <ArrowUpRight size={17} /></button>}
+    <button className="restart-button" onClick={onRestart}><RotateCcw size={12} /> Restart</button>
+    <div className="keyboard-help"><span className="micro-label">Keyboard</span><p><kbd>1–9</kbd> to enter <span>·</span> <kbd>N</kbd> for notes</p><p><kbd>↑ ↓ ← →</kbd> to move <span>·</span> <kbd>Ctrl Z</kbd> to undo</p></div>
   </aside>;
 }

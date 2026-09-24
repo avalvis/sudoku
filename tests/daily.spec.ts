@@ -3,7 +3,9 @@ import { dailyPuzzle } from '../src/domain/daily';
 
 const DATE = '2026-09-24';
 async function resume(page: Page) {
-  const button = page.getByRole('button', { name: 'Back to the puzzle' });
+  await expect(page.getByTestId('opening')).toHaveCount(0);
+  await expect(page.locator('.main-content')).toBeVisible();
+  const button = page.getByRole('button', { name: 'Resume' });
   if (await button.isVisible()) await button.click();
 }
 test.beforeEach(async ({ page }) => { await page.clock.setFixedTime(new Date('2026-09-24T10:00:00Z')); });
@@ -32,15 +34,15 @@ test('Daily completion is recorded once and replays retain the date', async ({ p
   for (let row = 0; row < 9; row++) for (let col = 0; col < 9; col++) if (puzzle.givens[row][col] === null) {
     await page.getByTestId(`cell-${row}-${col}`).click(); await page.keyboard.press(String(puzzle.solution[row][col]));
   }
-  await expect(page.getByRole('dialog')).toContainText('Beautifully done.');
+  await expect(page.getByRole('dialog')).toContainText('Puzzle complete');
   await page.getByRole('button', { name: 'Review board' }).click();
-  await expect(page.getByText(/1 daily edition completed/)).toBeVisible();
+  await expect(page.locator('.board-caption')).toContainText('Complete');
   await page.getByRole('link', { name: 'Stats', exact: true }).click();
   await expect(page.getByTestId('stats-completed')).toHaveText('1');
   await expect(page.getByText(`Daily · ${DATE}`, { exact: true })).toBeVisible();
   await page.getByRole('link', { name: 'Daily', exact: true }).click();
   await page.getByRole('button', { name: 'Review board' }).click();
-  await page.getByRole('button', { name: 'Start this one again' }).click();
+  await page.getByRole('button', { name: 'Restart' }).click();
   await page.getByRole('button', { name: 'Restart puzzle', exact: true }).click();
   await expect(page.getByLabel('Edition date', { exact: true })).toHaveValue(DATE);
   await page.getByRole('link', { name: 'Stats', exact: true }).click();

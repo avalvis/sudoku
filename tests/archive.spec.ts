@@ -13,7 +13,7 @@ test('archive filters, cancellation, exact puzzle selection, and restoration', a
   await start.click(); await expect(page.getByRole('dialog')).toContainText('abandoned');
   await page.keyboard.press('Escape'); await expect(start).toBeFocused();
   await page.getByRole('link', { name: 'Classic', exact: true }).click();
-  await page.getByRole('button', { name: 'Back to the puzzle' }).click();
+  await page.getByRole('button', { name: 'Resume' }).click();
   await expect(page.getByTestId('cell-0-0')).toHaveAttribute('aria-label', /notes 2/);
   await page.getByRole('link', { name: 'Archive', exact: true }).click();
   await card.getByRole('button', { name: 'Start puzzle' }).click();
@@ -24,7 +24,7 @@ test('archive filters, cancellation, exact puzzle selection, and restoration', a
   for (let row = 0; row < 9; row++) for (let col = 0; col < 9; col++) {
     await expect(page.getByTestId(`cell-${row}-${col}`)).toHaveText(puzzle.givens[row][col] === null ? '' : String(puzzle.givens[row][col]));
   }
-  await page.reload(); await page.getByRole('button', { name: 'Back to the puzzle' }).click();
+  await page.reload(); await page.getByRole('button', { name: 'Resume' }).click();
   await expect(page.getByText(/No. 008/)).toBeVisible();
   await page.getByRole('link', { name: 'Stats', exact: true }).click();
   await expect(page.getByText('Abandoned', { exact: true })).toBeVisible();
@@ -49,7 +49,7 @@ test('archive completion, replay, and current-board return preserve journal', as
   await expect(page.getByTestId('cell-0-0')).toHaveText('');
   await page.getByRole('link', { name: 'Archive', exact: true }).click();
   await card.getByRole('link', { name: 'Return to puzzle' }).click();
-  await page.getByRole('button', { name: 'Back to the puzzle' }).click();
+  await page.getByRole('button', { name: 'Resume' }).click();
   await page.getByRole('link', { name: 'Stats', exact: true }).click();
   await expect(page.getByTestId('stats-completed')).toHaveText('1');
   await expect(page.getByTestId('stats-rate')).toHaveText('100%');

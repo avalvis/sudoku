@@ -5,7 +5,7 @@ const puzzle = puzzles.find(p => p.id === 'medium-1')!;
 async function ready(page: Page) {
   await page.goto('/');
   await expect(page.locator('[role="gridcell"]')).toHaveCount(81);
-  const resume = page.getByRole('button', { name: 'Back to the puzzle' });
+  const resume = page.getByRole('button', { name: 'Resume' });
   if (await resume.isVisible()) await resume.click();
   await expect(page.getByRole('gridcell')).toHaveCount(81);
   await page.evaluate(() => document.fonts.ready);
@@ -22,16 +22,16 @@ test('keyboard play, notes, undo, hint, reload, and themes', async ({ page }) =>
   await page.getByRole('button', { name: 'Switch to dark theme' }).click();
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
   await page.reload();
-  await expect(page.getByRole('dialog')).toContainText('Take your time.');
-  await page.getByRole('button', { name: 'Back to the puzzle' }).click();
+  await expect(page.getByRole('dialog')).toContainText('Paused');
+  await page.getByRole('button', { name: 'Resume' }).click();
   await expect(cell).toHaveText(String(puzzle.solution[0][0]));
   await page.keyboard.press('Control+z'); await expect(cell).toHaveAttribute('aria-label', /notes 2$/);
   await page.getByRole('button', { name: /Hint/ }).click();
   await expect(cell).toHaveText(String(puzzle.solution[0][0]));
   await page.getByRole('link', { name: 'Daily', exact: true }).click();
-  await expect(page.getByRole('heading', { level: 1 })).toHaveText('A daily ritual.');
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Daily');
   await page.getByRole('link', { name: 'Classic', exact: true }).click();
-  await expect(page.getByRole('dialog')).toContainText('Take your time.');
+  await expect(page.getByRole('dialog')).toContainText('Paused');
   expect(errors).toEqual([]);
 });
 
@@ -53,10 +53,10 @@ test('completion, review, and next puzzle work end to end', async ({ page }) => 
     if (puzzle.givens[r][c] !== null) continue;
     await page.getByTestId(`cell-${r}-${c}`).click(); await page.keyboard.press(String(puzzle.solution[r][c]));
   }
-  await expect(page.getByRole('dialog')).toContainText('Beautifully done.');
+  await expect(page.getByRole('dialog')).toContainText('Puzzle complete');
   await page.getByRole('button', { name: 'Review board' }).click();
   await expect(page.getByRole('dialog')).toHaveCount(0);
-  await page.getByRole('button', { name: 'A new puzzle' }).click();
+  await page.getByRole('button', { name: 'New puzzle' }).click();
   await page.getByRole('button', { name: 'Start puzzle', exact: true }).click();
   await expect(page.getByText('No. 005', { exact: false })).toBeVisible();
 });
@@ -92,13 +92,13 @@ test('corrupt saves are preserved until explicit recovery', async ({ page }) => 
   });
   // Avoid pagehide writing over the intentionally corrupt fixture during reload.
   await page.reload();
-  await expect(page.getByRole('dialog')).toContainText('A fresh page?');
+  await expect(page.getByRole('dialog')).toContainText('Reset saved game?');
   const value = await page.evaluate(async () => {
     const db = await new Promise<IDBDatabase>(resolve => { const r = indexedDB.open('keyval-store'); r.onsuccess = () => resolve(r.result); });
     return new Promise(resolve => { const r = db.transaction('keyval').objectStore('keyval').get('editorial-sudoku-session'); r.onsuccess = () => { db.close(); resolve(r.result); }; });
   });
   expect(value).toBe('broken JSON');
-  await page.getByRole('button', { name: 'Start fresh' }).click();
+  await page.getByRole('button', { name: 'Reset game' }).click();
   await expect(page.getByRole('dialog')).toHaveCount(0);
 });
 
@@ -123,7 +123,7 @@ for (const scale of [1.25, 1.5, 2]) {
     const context = await browser.newContext({ viewport: { width: Math.round(1920 / scale), height: Math.round(1080 / scale) }, deviceScaleFactor: scale, reducedMotion: 'reduce' });
     const page = await context.newPage(); await ready(page);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
-    await page.getByRole('button', { name: 'A new puzzle' }).click();
+    await page.getByRole('button', { name: 'New puzzle' }).click();
     const dialog = await page.getByRole('dialog').boundingBox();
     expect(dialog!.y).toBeGreaterThanOrEqual(0); expect(dialog!.y + dialog!.height).toBeLessThanOrEqual(Math.round(1080 / scale));
     await context.close();

@@ -1,7 +1,7 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "Editorial Sudoku",
-  "version": "0.5.0",
+  "productName": "Sudoku",
+  "version": "0.6.0",
   "identifier": "dev.editorial.sudoku",
   "build": {
     "beforeDevCommand": "npm run dev",
@@ -10,7 +10,7 @@
     "frontendDist": "../dist"
   },
   "app": {
-    "windows": [{ "label": "main", "title": "Editorial — Sudoku", "width": 1280, "height": 900, "minWidth": 900, "minHeight": 700, "center": true, "resizable": true, "backgroundColor": "#F9F6F0" }],
+    "windows": [{ "label": "main", "title": "Sudoku", "width": 1280, "height": 900, "minWidth": 900, "minHeight": 700, "center": true, "resizable": true, "backgroundColor": "#F9F6F0" }],
     "security": {
       "csp": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src ipc: http://ipc.localhost; object-src 'none'; base-uri 'self'; frame-ancestors 'none'"
     }
@@ -18,13 +18,18 @@
   "bundle": {
     "active": true,
     "targets": ["nsis", "msi"],
-    "shortDescription": "A quiet place for a good puzzle.",
+    "shortDescription": "Offline Sudoku with Classic and Daily puzzles.",
+    "publisher": "Antonis Valvis",
+    "homepage": "https://www.avalvis.gr",
+    "copyright": "Copyright © 2026 Antonis Valvis",
     "category": "PuzzleGame",
     "icon": ["icons/32x32.png", "icons/128x128.png", "icons/128x128@2x.png", "icons/icon.ico"],
     "windows": {
+      "allowDowngrades": false,
+      "minimumWebview2Version": "120.0.0.0",
       "webviewInstallMode": { "type": "offlineInstaller", "silent": true },
-      "nsis": { "installMode": "currentUser", "displayLanguageSelector": false, "compression": "zlib" },
-      "wix": { "language": "en-US" }
+      "nsis": { "installMode": "currentUser", "displayLanguageSelector": false, "compression": "zlib", "installerIcon": "icons/icon.ico", "uninstallerIcon": "icons/icon.ico", "installerHooks": "installer-hooks.nsh" },
+      "wix": { "language": "en-US", "upgradeCode": "02ac6978-609c-5aea-8982-f2025e70da41" }
     }
   }
 }

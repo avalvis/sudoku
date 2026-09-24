@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ArrowRight, Library } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { puzzles } from '../domain/puzzles';
 import { DIFFICULTIES, type DifficultyFilter } from '../domain/statistics';
 import { formatTime } from '../domain/format';
@@ -31,7 +31,7 @@ export function ArchivePage() {
     location.hash = 'classic';
   };
   return <main id="main-content" tabIndex={-1} className="stats-page archive-page">
-    <header className="stats-heading"><div><span className="eyebrow">The classic collection / {puzzles.length} puzzles</span><h1>Pages worth keeping<span className="title-period">.</span></h1><p>Choose a fresh challenge, or return to an old favourite.</p></div><Library size={36} strokeWidth={1.1} aria-hidden="true" /></header>
+    <header className="stats-heading"><h1>Archive</h1></header>
     <div className="stats-toolbar"><label className="archive-uncompleted"><input type="checkbox" checked={uncompleted} onChange={event => { setUncompleted(event.target.checked); setPage(0); }} />Not yet completed</label><label className="stats-difficulty">Difficulty<select aria-label="Filter archive by difficulty" value={difficulty} onChange={event => { setDifficulty(event.target.value as DifficultyFilter); setPage(0); }}><option value="all">All difficulties</option>{DIFFICULTIES.map(d => <option key={d} value={d}>{d[0].toUpperCase() + d.slice(1)}</option>)}</select></label></div>
     <p id="archive-results" tabIndex={-1} className="archive-count" role="status">{visible.length} {visible.length === 1 ? 'puzzle' : 'puzzles'} · {entries.filter(e => e.completed.length).length} of {puzzles.length} completed · Page {currentPage + 1} of {pageCount}</p>
     <div className="archive-grid">{visible.slice(currentPage * 9, currentPage * 9 + 9).map(({ puzzle, edition, current, completed, normal, best }) => <article className="archive-card" key={puzzle.id} aria-labelledby={`title-${puzzle.id}`}>
@@ -45,10 +45,9 @@ export function ArchivePage() {
     </article>)}</div>
     {pageCount > 1 && <nav className="journal-pagination" aria-label="Archive pages"><button className="secondary-button" disabled={currentPage === 0} onClick={() => changePage(currentPage - 1)}>Previous page</button><span>Page {currentPage + 1} of {pageCount}</span><button className="secondary-button" disabled={currentPage === pageCount - 1} onClick={() => changePage(currentPage + 1)}>Next page</button></nav>}
     {!visible.length && <div className="journal-empty"><p>No puzzles match these filters.</p><button className="secondary-button" onClick={() => { setDifficulty('all'); setUncompleted(false); }}>Show all puzzles</button></div>}
-    <footer className="stats-footnote"><p>Every replay begins a new attempt. Only one Classic puzzle can be in progress at a time; Daily boards are saved separately. Completions include practice games; best times use normal games only. Your full attempt history is in <a href="#stats">Stats</a>.</p><span>{puzzles.length} puzzles, available offline. More editions will follow.</span></footer>
-    {selected && <Dialog title="Open a new page." eyebrow={`Classic / ${selected.difficulty} / ${selected.id}`} onClose={() => setSelected(null)}>
-      <p>{session.started && session.status !== 'completed' ? 'Opening this puzzle replaces your unfinished board. The current attempt will be saved as abandoned in your journal.' : 'Begin a fresh attempt with a clear board, a reset timer, and two hints. Previous results stay in your journal.'}</p>
-      <div className="dialog-actions"><button className="secondary-button" onClick={() => setSelected(null)}>Keep current puzzle</button><button className="primary-button" onClick={start}>Open puzzle</button></div>
+    {selected && <Dialog title="Open puzzle?" eyebrow={`Classic / ${selected.difficulty} / ${selected.id}`} onClose={() => setSelected(null)}>
+      <p>{session.started && session.status !== 'completed' ? 'This replaces your unfinished board. The current attempt will be saved as abandoned.' : 'Start a new attempt. Previous results are kept.'}</p>
+      <div className="dialog-actions"><button className="secondary-button" onClick={() => setSelected(null)}>Cancel</button><button className="primary-button" onClick={start}>Open puzzle</button></div>
     </Dialog>}
   </main>;
 }

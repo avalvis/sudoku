@@ -1,8 +1,9 @@
 [package]
-name = "editorial-sudoku"
-version = "0.5.0"
-description = "A quiet place for a good puzzle"
-authors = ["Editorial Sudoku"]
+name = "sudoku"
+version = "0.6.0"
+description = "Offline Sudoku with Classic and Daily puzzles"
+authors = ["Antonis Valvis"]
+homepage = "https://www.avalvis.gr"
 edition = "2021"
 rust-version = "1.77.2"
 

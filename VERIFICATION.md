@@ -2,6 +2,13 @@
 
 ## Passed
 
+- Version 0.6.0: renamed Sudoku, numbered icon, skippable author opening, simplified interface text, and height-aware desktop layout. Both NSIS and MSI packages built with offline WebView2, publisher Antonis Valvis, and website https://www.avalvis.gr. Executable product/company/version metadata verified.
+- Native rename upgrade tested: installed 0.5.0 into an isolated directory, saved notes on puzzle 036, installed 0.6.0, confirmed removal of the old executable and preservation of the board/notes. A second full process restart restored progress with no runtime errors. NSIS registry metadata matched the requested publisher and website.
+- Version 0.6.0 NSIS uninstallation returned 0 and removed the installed executable. Only isolated test registrations were cleaned afterward. SHA-256 checksums were generated for both final installers.
+- Current automated suite: 53 unit/component tests and 41 browser tests passed; lint, TypeScript, Rust formatting, and production build passed. PowerShell MSI verification script parsed successfully.
+- Classic and Daily no-scroll assertions passed at 1920×1080, 1920×1000, 1536×824, 1280×900, and 1280×680. Assertions check document height and board/control bounds rather than concealing overflow. Opening credit, dismissal, and input blocking were tested. The 1920×1080 Daily screenshot was inspected.
+- Added reproducible logical puzzle audit. All derived entries match independently validated solutions. It found 11/12 Medium and 9/12 Hard fixtures solvable by singles alone; see `PUZZLE_QUALITY.md`. This audit does not certify the current difficulty labels.
+
 - Version 0.5.0 production build and both Windows installers generated successfully. NSIS installation into an isolated directory returned 0. The installed executable opened expanded puzzle 036 through paginated Archive navigation, saved notes, and restored them after process restart with no runtime errors. Uninstallation returned 0 and removed the executable; its leftover test registry entry was cleaned. SHA-256 hashes are recorded in `src-tauri/target/release/bundle/SHA256SUMS.txt`.
 
 - Version 0.4.0 production frontend and both Windows installers built successfully. Native Daily tests passed before and after process restart using an isolated profile: Classic and Daily notes/history persisted independently, switching caused no false abandonments, and no runtime errors occurred. The 0.4.0 installer installation/uninstallation cycle was not repeated.
@@ -30,6 +37,7 @@
 - The WebView2 runtime was already present. Installation on a clean Windows machine without WebView2 has not been exercised, although the offline runtime is included in both packages.
 - Display scaling was tested through browser device-scale factors. A manual Windows DPI/multi-monitor check remains a release follow-up.
 - Installers are unsigned. Signing and public distribution are intentionally not configured.
+- No code-signing certificate was found in the current user's certificate store. An administrator MSI install/uninstall script is now included in Windows CI, but that CI run has not been executed here. Successful local compilation does not establish a successful administrator installation.
 - All 36 Classic puzzles have verified unique solutions; difficulty tiers are based on clue density, not calibrated human solving techniques. Daily retains its original nine base fixtures to preserve published date mappings.
 
 Browser screenshots are generated under `test-results/`. Build artifacts are under `src-tauri/target/release/bundle/`. Temporary native profiles and installer logs are isolated under `.cache/`; these directories are ignored by version control.

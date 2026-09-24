@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { ArrowRight, BookOpen, Check, Clock3, Feather } from 'lucide-react';
+import { ArrowRight, Check, Clock3 } from 'lucide-react';
 import { useGame } from '../store/game-store';
 import { DIFFICULTIES, summarizeResults, type DifficultyFilter } from '../domain/statistics';
 import { formatTime } from '../domain/format';
@@ -11,7 +11,7 @@ const dateFormatter = new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', 
 
 function ResultJournal({ results }: { results: GameResult[] }) {
   const [visibleCount, setVisibleCount] = useState(10);
-  if (!results.length) return <div className="journal-empty"><Feather size={24} strokeWidth={1.3} /><div><h3>Your next chapter is unwritten.</h3><p>Finished and abandoned attempts will appear here. A paused game stays in progress.</p></div></div>;
+  if (!results.length) return <div className="journal-empty"><p>No games yet.</p></div>;
   return <>
     <div className="stats-table-scroll"><table className="results-table">
       <caption className="sr-only">Game history, most recently finished first</caption>
@@ -38,12 +38,12 @@ export function StatsPage() {
   const byDifficulty = useMemo(() => DIFFICULTIES.map(d => ({ difficulty: d, ...summarizeResults(results, session, practice, d, parked) })), [results, session, practice, parked]);
   const rows = difficulty === 'all' ? byDifficulty : byDifficulty.filter(row => row.difficulty === difficulty);
   return <main id="main-content" tabIndex={-1} className="stats-page">
-    <header className="stats-heading"><div><span className="eyebrow">Your personal puzzle journal</span><h1>Progress, in perspective<span className="title-period">.</span></h1><p>A record of the time, thought, and patience you put into every page.</p></div><BookOpen size={36} strokeWidth={1.1} aria-hidden="true" /></header>
+    <header className="stats-heading"><h1>Stats</h1></header>
     <div className="stats-toolbar">
       <div className="stats-mode-switch" role="group" aria-label="Results mode"><button aria-pressed={!practice} onClick={() => setPractice(false)}>Normal games</button><button aria-pressed={practice} onClick={() => setPractice(true)}>Practice games</button></div>
       <label className="stats-difficulty">Difficulty<select aria-label="Filter statistics by difficulty" value={difficulty} onChange={event => setDifficulty(event.target.value as DifficultyFilter)}><option value="all">All difficulties</option>{DIFFICULTIES.map(d => <option key={d} value={d}>{d[0].toUpperCase() + d.slice(1)}</option>)}</select></label>
     </div>
-    <p className="stats-mode-note">{practice ? 'Practice results have their own record and never affect your normal-game statistics.' : 'Normal games only. Games continued in practice are counted in the Practice journal.'}</p>
+    <p className="stats-mode-note">{practice ? 'Practice games only.' : 'Excludes practice games.'}</p>
     <section className="stats-summary" aria-label="Statistics summary" aria-live="polite" aria-atomic="true">
       <div className="stat-card"><span className="eyebrow">Completed puzzles</span><strong data-testid="stats-completed">{stats.completed}</strong><span>of {stats.attempts} started {stats.attempts === 1 ? 'attempt' : 'attempts'}</span></div>
       <div className="stat-card"><span className="eyebrow">Completion rate</span><strong data-testid="stats-rate">{stats.completionRate === null ? '—' : `${stats.completionRate}%`}</strong><span>{stats.active ? 'Includes your current puzzle' : 'Completed ÷ started attempts'}</span></div>
@@ -51,12 +51,11 @@ export function StatsPage() {
       <div className="stat-card"><span className="eyebrow">Average time</span><strong data-testid="stats-average">{timeOrDash(stats.averageSeconds)}</strong><span>Completed puzzles only</span></div>
     </section>
     <div className="stats-totals"><span><strong>{stats.abandoned}</strong> abandoned</span><span><strong>{stats.active}</strong> in progress</span><span><strong>{stats.mistakes}</strong> mistakes</span><span><strong>{stats.hintsUsed}</strong> hints used</span></div>
-    {stats.active > 0 && <div className="stats-active"><Clock3 size={18} /><span>{stats.active === 1 ? 'Your current puzzle is waiting right where you left it.' : `${stats.active} puzzles are saved in progress.`}</span><a href={isDaily(session.puzzleId) ? '#daily' : '#classic'}>Return to puzzle <ArrowRight size={15} /></a></div>}
-    {stats.attempts === 0 && <div className="stats-introduction"><Feather size={22} strokeWidth={1.3} /><p>{practice ? 'There are no practice attempts in this selection yet.' : 'Your journal begins with your first digit, pencil note, or hint.'} <a href="#classic">Find your focus <ArrowRight size={13} /></a></p></div>}
-    <section className="stats-section" aria-labelledby="difficulty-stats-title"><div className="stats-section-heading"><h2 id="difficulty-stats-title">At every difficulty</h2><span className="eyebrow">{practice ? 'Practice' : 'Normal'} · {difficulty === 'all' ? 'All difficulties' : difficulty}</span></div>
+    {stats.active > 0 && <div className="stats-active"><Clock3 size={18} /><span>{stats.active === 1 ? 'A puzzle is in progress.' : `${stats.active} puzzles are saved in progress.`}</span><a href={isDaily(session.puzzleId) ? '#daily' : '#classic'}>Return to puzzle <ArrowRight size={15} /></a></div>}
+    <section className="stats-section" aria-labelledby="difficulty-stats-title"><div className="stats-section-heading"><h2 id="difficulty-stats-title">By difficulty</h2><span className="eyebrow">{practice ? 'Practice' : 'Normal'} · {difficulty === 'all' ? 'All difficulties' : difficulty}</span></div>
       <div className="stats-table-scroll"><table className="difficulty-stats-table"><caption className="sr-only">Statistics by difficulty</caption><thead><tr><th scope="col">Difficulty</th><th scope="col">Started</th><th scope="col">Completed</th><th scope="col">Completion</th><th scope="col">Best time</th><th scope="col">Average time</th></tr></thead><tbody>{rows.map(row => <tr key={row.difficulty}><th scope="row" className="capitalize"><i className={`difficulty-dot ${row.difficulty}`} />{row.difficulty}</th><td>{row.attempts}</td><td>{row.completed}</td><td>{row.completionRate === null ? '—' : `${row.completionRate}%`}</td><td>{timeOrDash(row.bestSeconds)}</td><td>{timeOrDash(row.averageSeconds)}</td></tr>)}</tbody></table></div>
     </section>
-    <section className="stats-section" aria-labelledby="journal-title"><div className="stats-section-heading"><h2 id="journal-title">The pages you’ve turned</h2><span className="eyebrow">Most recent first</span></div><ResultJournal key={`${practice}-${difficulty}`} results={stats.results} /></section>
-    <footer className="stats-footnote"><p>An attempt starts with the first board change. Restarting or replacing it records an abandoned attempt; pausing, closing, or switching editions does not. All started boards count toward completion rate. Times use completed puzzles, including those with hints. Classic and Daily results are included.</p><span>Saved on this device. One square at a time.</span></footer>
+    <section className="stats-section" aria-labelledby="journal-title"><div className="stats-section-heading"><h2 id="journal-title">History</h2><span className="eyebrow">Most recent first</span></div><ResultJournal key={`${practice}-${difficulty}`} results={stats.results} /></section>
+    <details className="stats-footnote"><summary>How statistics are calculated</summary><p>An attempt starts with the first board change. Restarting or replacing it records an abandoned attempt. Saved unfinished boards count toward completion rate. Times include completed games with hints.</p></details>
   </main>;
 }

@@ -11,8 +11,10 @@ try {
   const page = context.pages()[0] ?? await context.waitForEvent('page');
   const errors = []; page.on('pageerror', error => errors.push(error.message));
   await page.waitForURL(/tauri\.localhost/);
+  await expect(page.getByTestId('opening')).toHaveCount(0);
+  await expect(page.locator('#main-content')).toBeVisible();
   await expect(page.locator('[role="gridcell"]')).toHaveCount(81);
-  const resume = async () => { const button = page.getByRole('button', { name: 'Back to the puzzle' }); if (await button.isVisible()) await button.click(); };
+  const resume = async () => { const button = page.getByRole('button', { name: 'Resume' }); if (await button.isVisible()) await button.click(); };
   await resume();
   if (!process.argv.includes('--restore')) {
     await page.getByTestId('cell-0-0').click(); await page.keyboard.press('n'); await page.keyboard.press('2');

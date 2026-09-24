@@ -4,7 +4,7 @@ import { writeFile } from 'node:fs/promises';
 import metadata from '../package.json' with { type: 'json' };
 
 const root = new URL('../src-tauri/target/release/bundle/', import.meta.url);
-const files = [`nsis/Editorial Sudoku_${metadata.version}_x64-setup.exe`, `msi/Editorial Sudoku_${metadata.version}_x64_en-US.msi`];
+const files = [`nsis/Sudoku_${metadata.version}_x64-setup.exe`, `msi/Sudoku_${metadata.version}_x64_en-US.msi`];
 const lines = [];
 for (const file of files) {
   const hash = createHash('sha256');

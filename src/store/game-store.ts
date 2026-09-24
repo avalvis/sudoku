@@ -72,7 +72,7 @@ export function createGameStore(storage: StateStorage = indexedDbStorage, now = 
         session,
         results: status === 'completed' ? recordResult(state.results, session, 'completed', session.completedAt) : state.results,
         conflictEvent: state.conflictEvent + (conflict ? 1 : 0),
-        announcement: status === 'completed' ? 'Puzzle complete. Beautifully done.' : conflict ? `Duplicate ${after.value}. ${mistakes} mistakes.` :
+        announcement: status === 'completed' ? 'Puzzle complete. Puzzle complete' : conflict ? `Duplicate ${after.value}. ${mistakes} mistakes.` :
           hint ? `Hint: ${after.value} placed in row ${position.row + 1}, column ${position.col + 1}.` : after.value ? `${after.value} placed.` : after.notes.length ? 'Pencil notes updated.' : 'Cell cleared.',
       });
       play(status === 'completed' ? 'success' : conflict ? 'alert' : after.notes.length ? 'pencil' : 'tap');
@@ -139,7 +139,7 @@ export function createGameStore(storage: StateStorage = indexedDbStorage, now = 
       },
       continuePractice: () => {
         if (get().session.status !== 'mistake-limit') return;
-        anchor = now(); set({ session: { ...get().session, practice: true, status: 'playing' }, announcement: 'Practice mode. Take your time.' });
+        anchor = now(); set({ session: { ...get().session, practice: true, status: 'playing' }, announcement: 'Practice mode. Paused' });
       },
       newGame: (difficulty, restart = false) => {
         if (!get().hydrated || get().recoveryNeeded) return;
@@ -155,7 +155,7 @@ export function createGameStore(storage: StateStorage = indexedDbStorage, now = 
         const state = get();
         const previous = { ...state.session, elapsedSeconds: checkpointTime() };
         const results = previous.status === 'completed' ? state.results : recordResult(state.results, previous, 'abandoned', Math.max(wallNow(), previous.startedAt ?? 0));
-        anchor = now(); set({ ...fresh(p), results, announcement: 'A fresh page. Enjoy your puzzle.', conflictEvent: 0 });
+        anchor = now(); set({ ...fresh(p), results, announcement: 'New puzzle started.', conflictEvent: 0 });
       },
       switchGame: slot => {
         const state = get();
@@ -168,7 +168,7 @@ export function createGameStore(storage: StateStorage = indexedDbStorage, now = 
         const target = savedGames[slot] ?? fresh(puzzle);
         delete savedGames[slot];
         anchor = target.session.status === 'playing' ? now() : null;
-        set({ ...target, savedGames, conflictEvent: 0, announcement: 'Your edition is ready.' });
+        set({ ...target, savedGames, conflictEvent: 0, announcement: 'Puzzle ready.' });
       },
       toggleTheme: () => { if (get().hydrated && !get().recoveryNeeded) set({ theme: get().theme === 'light' ? 'dark' : 'light' }); },
       toggleSound: () => { if (!get().hydrated || get().recoveryNeeded) return; const enabled = !get().soundEnabled; audio.setMuted(!enabled); set({ soundEnabled: enabled }); if (enabled) play('tap'); },
@@ -180,7 +180,7 @@ export function createGameStore(storage: StateStorage = indexedDbStorage, now = 
       },
       displayedSeconds: seconds,
       recover: () => {
-        anchor = now(); set({ ...fresh(nextPuzzle('medium')), savedGames: {}, results: [], recoveryNeeded: false, storageError: null, announcement: 'A fresh puzzle is ready.' });
+        anchor = now(); set({ ...fresh(nextPuzzle('medium')), savedGames: {}, results: [], recoveryNeeded: false, storageError: null, announcement: 'New puzzle ready.' });
       },
     };
   }, {
