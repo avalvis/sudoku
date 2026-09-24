@@ -5,7 +5,7 @@ const puzzle = nextPuzzle('medium');
 async function ready(page: Page) {
   await page.goto('/');
   await expect(page.locator('[role="gridcell"]')).toHaveCount(81);
-  const resume = page.getByRole('button', { name: 'Resume' });
+  const resume = page.getByRole('button', { name: 'Resume puzzle' });
   if (await resume.isVisible()) await resume.click();
   await expect(page.getByRole('gridcell')).toHaveCount(81);
   await page.evaluate(() => document.fonts.ready);
@@ -22,8 +22,8 @@ test('keyboard play, notes, undo, hint, reload, and themes', async ({ page }) =>
   await page.getByRole('button', { name: 'Switch to dark theme' }).click();
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
   await page.reload();
-  await expect(page.getByRole('dialog')).toContainText('Paused');
-  await page.getByRole('button', { name: 'Resume' }).click();
+  await expect(page.getByRole('heading', { name: 'Continue your puzzle?' })).toBeVisible();
+  await page.getByRole('button', { name: 'Resume puzzle' }).click();
   await expect(cell).toHaveText(String(puzzle.solution[0][0]));
   await page.keyboard.press('Control+z'); await expect(cell).toHaveAttribute('aria-label', /notes 2$/);
   await page.getByRole('button', { name: /Hint/ }).click();
@@ -31,7 +31,7 @@ test('keyboard play, notes, undo, hint, reload, and themes', async ({ page }) =>
   await page.getByRole('link', { name: 'Daily', exact: true }).click();
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Daily');
   await page.getByRole('link', { name: 'Classic', exact: true }).click();
-  await expect(page.getByRole('dialog')).toContainText('Paused');
+  await expect(page.getByTestId('pause-panel')).toBeVisible();
   expect(errors).toEqual([]);
 });
 
@@ -62,16 +62,18 @@ test('completion, review, and next puzzle work end to end', async ({ page }) => 
   await expect(page.getByText('No. 3047', { exact: false })).toBeVisible();
 });
 
-test('pause traps focus, suspends keys, and supports resume', async ({ page }) => {
+test('pause stays inside the board, suspends keys, and leaves navigation available', async ({ page }) => {
   await ready(page); await page.getByRole('button', { name: 'Pause game' }).click();
-  await expect(page.getByRole('dialog')).toBeVisible();
-  await page.keyboard.press('4'); await page.keyboard.press('Tab');
-  expect(await page.evaluate(() => !!document.activeElement?.closest('dialog'))).toBe(true);
-  await page.keyboard.press('Escape');
   await expect(page.getByRole('dialog')).toHaveCount(0);
+  await expect(page.getByTestId('pause-panel')).toBeVisible();
+  await page.keyboard.press('4'); await page.keyboard.press('Tab');
+  await page.getByRole('button', { name: 'Resume puzzle', exact: true }).click();
+  await expect(page.getByTestId('pause-panel')).toHaveCount(0);
   await expect(page.getByTestId('cell-0-0')).toHaveAttribute('aria-label', /empty/);
   await page.evaluate(() => window.dispatchEvent(new Event('blur')));
-  await expect(page.getByRole('dialog')).toBeVisible();
+  await expect(page.getByTestId('pause-panel')).toBeVisible();
+  await page.getByRole('link', { name: 'Stats', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'Stats' })).toBeVisible();
 });
 
 test('difficulty selection confirms before replacing the board', async ({ page }) => {

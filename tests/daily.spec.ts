@@ -5,7 +5,7 @@ const DATE = '2026-09-24';
 async function resume(page: Page) {
   await expect(page.getByTestId('opening')).toHaveCount(0);
   await expect(page.locator('.main-content')).toBeVisible();
-  const button = page.getByRole('button', { name: 'Resume' });
+  const button = page.getByRole('button', { name: 'Resume puzzle' });
   if (await button.isVisible()) await button.click();
 }
 test.beforeEach(async ({ page }) => { await page.clock.setFixedTime(new Date('2026-09-24T10:00:00Z')); });

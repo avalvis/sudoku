@@ -14,7 +14,7 @@ export function DialogHost({ requested, close, classic }: { requested: Requested
   const history = useGame(s => s.history);
   const [reviewed, setReviewed] = useState<Move[] | null>(null);
   const [difficulty, setDifficulty] = useState<Difficulty>(session.difficulty);
-  const { recover, resume, continuePractice, newGame } = useGame.getState();
+  const { recover, continuePractice, newGame } = useGame.getState();
   const start = (d: Difficulty, restart = false) => { newGame(d, restart); close(); };
   if (recovery) return <Dialog title="Reset saved game?" eyebrow="Saved game needs attention">
     <p>The saved game could not be loaded. Reset it to start a new Medium puzzle. This replaces the unreadable save.</p>
@@ -29,9 +29,6 @@ export function DialogHost({ requested, close, classic }: { requested: Requested
     <div className="dialog-actions"><button className="secondary-button" onClick={close}>Cancel</button><button className="primary-button" onClick={() => start(requested === 'restart' ? session.difficulty : difficulty, requested === 'restart')}>{requested === 'restart' ? 'Restart puzzle' : 'Start puzzle'}</button></div>
   </Dialog>;
   if (!classic) return null;
-  if (session.status === 'paused') return <Dialog title="Paused" eyebrow="" onClose={resume}>
-    <button className="primary-button" onClick={resume}>Resume</button>
-  </Dialog>;
   if (session.status === 'mistake-limit') return <Dialog title="Mistake limit reached" eyebrow="Three mistakes">
     <p>Continue without a mistake limit, or restart.</p>
     <div className="dialog-actions"><button className="secondary-button" onClick={() => start(session.difficulty, true)}>Restart puzzle</button><button className="primary-button" onClick={continuePractice}>Continue practice</button></div>

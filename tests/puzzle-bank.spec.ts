@@ -22,7 +22,7 @@ test('bank-backed Daily edition works offline and restores notes and Undo', asyn
   await page.clock.setFixedTime(new Date(2026, 8, 26, 12));
   await page.goto('/#daily');
   await expect(page.getByTestId('opening')).toHaveCount(0);
-  const resume = page.getByRole('button', { name: 'Resume', exact: true });
+  const resume = page.getByRole('button', { name: 'Resume puzzle', exact: true });
   if (await resume.isVisible()) await resume.click();
   const cell = page.getByRole('gridcell', { name: /empty/ }).first();
   const id = (await cell.getAttribute('data-testid'))!;
@@ -30,7 +30,7 @@ test('bank-backed Daily edition works offline and restores notes and Undo', asyn
   await cell.click(); await page.keyboard.press('n'); await page.keyboard.press('2'); await page.keyboard.press('4');
   await expect(page.getByTestId(id)).toHaveAttribute('aria-label', /notes 2, 4/);
   await context.setOffline(false);
-  await page.reload(); await page.getByRole('button', { name: 'Resume', exact: true }).click();
+  await page.reload(); await page.getByRole('button', { name: 'Resume puzzle', exact: true }).click();
   await expect(page.getByTestId(id)).toHaveAttribute('aria-label', /notes 2, 4/);
   await page.keyboard.press('Control+z');
   await expect(page.getByTestId(id)).toHaveAttribute('aria-label', /notes 2$/);

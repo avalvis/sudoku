@@ -16,7 +16,7 @@ try {
   await page.waitForURL(/tauri\.localhost/);
   await expect(page.getByTestId('opening')).toHaveCount(0);
   await expect(page.locator('#main-content')).toBeVisible();
-  const resume = page.getByRole('button', { name: 'Resume' });
+  const resume = page.getByRole('button', { name: 'Resume puzzle' });
   if (await resume.isVisible()) await resume.click();
   if (!process.argv.includes('--restore')) {
     await expect(page.locator('[role="gridcell"]')).toHaveCount(81);

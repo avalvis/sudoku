@@ -151,6 +151,16 @@ h1 { margin: 6px 0 0; font-family: var(--font-editorial); font-weight: 500; font
 .obscured { visibility: hidden; }
 .board-cover { position: absolute; inset: 0; display: flex; flex-direction: column; gap: 22px; justify-content: center; align-items: center; color: var(--muted); }
 .board-cover span { font-family: var(--font-editorial); font-size: 22px; }
+.pause-panel { position: absolute; inset: 0; display: grid; place-items: center; padding: 24px; }
+.pause-card { width: min(320px, 100%); color: var(--ink); }
+.pause-card > .eyebrow { color: var(--secondary); line-height: 1.6; margin: 0 0 12px; }
+.pause-card h2 { font-family: var(--font-editorial); font-size: clamp(24px, 2.4vw, 30px); font-weight: 500; line-height: 1.25; letter-spacing: -.7px; margin: 0; }
+.pause-summary { display: flex; gap: 48px; padding: 20px 0; margin: 0 0 20px; border-bottom: 1px solid var(--stroke); }
+.pause-summary dt { color: var(--secondary); font-size: 10px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+.pause-summary dd { margin: 0; font-size: 22px; font-variant-numeric: tabular-nums; }
+.pause-summary small { font-size: 13px; color: var(--secondary); }
+.pause-actions { display: grid; gap: 10px; }
+.pause-actions .primary-button, .pause-actions .secondary-button { display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; width: 100%; }
 .board-caption { display: flex; justify-content: space-between; gap: 12px; margin-top: 13px; font-size: 10px; letter-spacing: .15px; color: var(--secondary); }
 .board-caption > span { display: flex; align-items: center; gap: 7px; }
 .board-caption > span:last-child { color: var(--muted); }

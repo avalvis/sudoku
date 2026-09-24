@@ -13,7 +13,7 @@ try {
   await page.waitForURL(/tauri\.localhost/);
   await expect(page.getByTestId('opening')).toHaveCount(0);
   await expect(page.locator('#main-content')).toBeVisible();
-  const resume = page.getByRole('button', { name: 'Resume' });
+  const resume = page.getByRole('button', { name: 'Resume puzzle' });
   if (await resume.isVisible()) await resume.click();
   if (!process.argv.includes('--restore')) {
     await page.getByRole('link', { name: 'Archive', exact: true }).click();
@@ -30,7 +30,7 @@ try {
   const current = page.getByRole('article', { name: 'Puzzle 008' });
   await expect(current).toContainText('Your puzzle in progress');
   await current.getByRole('link', { name: 'Return to puzzle' }).click();
-  await page.getByRole('button', { name: 'Resume' }).click();
+  await page.getByRole('button', { name: 'Resume puzzle' }).click();
   await expect(page.getByTestId('cell-0-0')).toHaveAttribute('aria-label', /notes 2/);
   await page.getByRole('button', { name: 'Pause game' }).click();
   const save = await page.evaluate(async () => {

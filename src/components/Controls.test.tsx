@@ -11,7 +11,7 @@ beforeEach(() => {
   useGame.setState({ hydrated: true }); useGame.getState().newGame('medium', true);
 });
 it('exposes roving grid focus, givens, and a persistent notes switch', () => {
-  render(<><SudokuBoard /><GameControlPanel onNewGame={() => {}} onRestart={() => {}} onDifficulty={() => {}} /></>);
+  render(<><SudokuBoard onNewGame={() => {}} /><GameControlPanel onNewGame={() => {}} onRestart={() => {}} onDifficulty={() => {}} /></>);
   expect(screen.getAllByRole('gridcell')).toHaveLength(81);
   expect(screen.getAllByRole('gridcell').filter(c => c.tabIndex === 0)).toHaveLength(1);
   const notes = screen.getByRole('button', { name: /Notes OFF/ });

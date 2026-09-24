@@ -27,12 +27,12 @@ test('new Daily schedule saves and restores a graded edition', async ({ page }) 
   await page.clock.setFixedTime(new Date(2026, 8, 25, 12));
   await page.goto('/#daily');
   await expect(page.getByTestId('opening')).toHaveCount(0);
-  const resume = page.getByRole('button', { name: 'Resume', exact: true });
+  const resume = page.getByRole('button', { name: 'Resume puzzle', exact: true });
   if (await resume.isVisible()) await resume.click();
   const cell = page.getByRole('gridcell', { name: /empty/ }).first();
   const id = await cell.getAttribute('data-testid');
   await cell.click(); await page.keyboard.press('n'); await page.keyboard.press('2');
   await expect(page.getByTestId(id!)).toHaveAttribute('aria-label', /notes 2/);
-  await page.reload(); await page.getByRole('button', { name: 'Resume', exact: true }).click();
+  await page.reload(); await page.getByRole('button', { name: 'Resume puzzle', exact: true }).click();
   await expect(page.getByTestId(id!)).toHaveAttribute('aria-label', /notes 2/);
 });

@@ -13,7 +13,14 @@ try {
   await page.waitForURL(/tauri\.localhost/);
   await expect(page.getByTestId('opening')).toHaveCount(0);
   await expect(page.locator('#main-content')).toBeVisible();
-  const resume = page.getByRole('button', { name: 'Resume' });
+  if (process.argv.includes('--restore')) {
+    await expect(page.getByTestId('pause-panel')).toContainText('Continue your puzzle?');
+    await expect(page.getByRole('dialog')).toHaveCount(0);
+    await page.getByRole('button', { name: 'Start new puzzle' }).click();
+    await page.getByRole('button', { name: 'Cancel', exact: true }).click();
+    await expect(page.getByTestId('pause-panel')).toBeVisible();
+  }
+  const resume = page.getByRole('button', { name: 'Resume puzzle' });
   if (await resume.isVisible()) await resume.click();
   if (!process.argv.includes('--restore')) {
     await page.getByRole('link', { name: 'Archive', exact: true }).click();
@@ -37,7 +44,7 @@ try {
   const current = page.getByRole('article', { name: 'Puzzle 9045' });
   await expect(current).toContainText('Your puzzle in progress');
   await current.getByRole('link', { name: 'Return to puzzle' }).click();
-  await page.getByRole('button', { name: 'Resume' }).click();
+  await page.getByRole('button', { name: 'Resume puzzle' }).click();
   await expect(page.getByRole('gridcell', { name: /notes 2/ })).toBeVisible();
   await page.getByRole('button', { name: 'Pause game' }).click();
   const save = await page.evaluate(async () => {

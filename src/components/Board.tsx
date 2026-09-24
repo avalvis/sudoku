@@ -4,8 +4,9 @@ import { Feather, LockKeyhole, Check } from 'lucide-react';
 import { useGame } from '../store/game-store';
 import { cellId, findConflicts, isPeer, noteConflicts } from '../domain/rules';
 import { DIGITS, type CellPosition } from '../domain/types';
+import { PausePanel } from './PausePanel';
 
-export const SudokuBoard = memo(function SudokuBoard() {
+export const SudokuBoard = memo(function SudokuBoard({ onNewGame }: { onNewGame: () => void }) {
   const board = useGame(s => s.board);
   const selected = useGame(s => s.selected);
   const select = useGame(s => s.select);
@@ -44,7 +45,8 @@ export const SudokuBoard = memo(function SudokuBoard() {
           })}
         </div>)}
       </div>
-      {obscured && <div className="board-cover" aria-hidden="true"><Feather size={36} /><span>Paused</span></div>}
+      {status === 'paused' && <PausePanel onNewGame={onNewGame} />}
+      {status === 'mistake-limit' && <div className="board-cover" aria-hidden="true"><Feather size={36} /><span>Paused</span></div>}
     </div>
     <div className="board-caption">
       <span><Feather size={14} className="ochre" /> Row {selected.row + 1}<span className="caption-dot">·</span>Column {selected.col + 1}</span>

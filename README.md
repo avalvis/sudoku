@@ -91,6 +91,8 @@ Version-2 saves migrate to version 3 without changing their board or journal. Ve
 
 ## Desktop design
 
+Version 0.9.0 replaces the automatic resume modal with an in-board pause panel. A restored unfinished puzzle shows “Continue your puzzle?” with mode/difficulty, elapsed time, and filled-cell count. Resume returns keyboard focus to the selected cell. Start new puzzle opens the existing difficulty/replace confirmation; Cancel preserves the paused board and returns focus to that button. Ordinary pauses show “Paused”, with navigation and theme/sound controls still available. Daily offers “Play Classic” while preserving its separately saved progress. Time and game input remain suspended until explicit Resume. The restored-session UI marker is transient and does not alter the save format.
+
 The source references in `assets/stitch/` are preserved. Their visual language is adapted to desktop: top navigation, a centered square board, a 280px control panel, and a 3×3 keypad. Below 1100 CSS pixels, controls stack beneath the board with a horizontal keypad. The native window starts at 1280×900 with a 900×700 minimum. Board size accounts for available viewport height and the additional Daily controls. Wide gameplay fits without scrolling at tested sizes down to 1280×680 CSS pixels; smaller stacked windows can scroll rather than clipping controls.
 
 The numbered app icon is generated from `public/favicon.svg`. A skippable 1.5-second opening displays “Developed by Antonis Valvis”; reduced motion shortens it and removes movement. The game clock remains stopped during this opening. Headings, controls, and dialogs use concise functional text.

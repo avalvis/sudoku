@@ -5,7 +5,7 @@ const puzzle = nextPuzzle('medium');
 async function ready(page: Page) {
   await page.goto('/');
   await expect(page.locator('[role="gridcell"]')).toHaveCount(81);
-  const resume = page.getByRole('button', { name: 'Resume' });
+  const resume = page.getByRole('button', { name: 'Resume puzzle' });
   if (await resume.isVisible()) await resume.click();
 }
 async function goStats(page: Page) {
@@ -15,7 +15,7 @@ async function goStats(page: Page) {
 async function backToPuzzle(page: Page) {
   await page.getByRole('link', { name: 'Classic', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'Classic', exact: true })).toBeVisible();
-  const resume = page.getByRole('button', { name: 'Resume' });
+  const resume = page.getByRole('button', { name: 'Resume puzzle' });
   if (await resume.isVisible()) await resume.click();
 }
 async function readSave(page: Page) {
@@ -87,7 +87,7 @@ test('a v1 save migrates in the browser with notes, undo, and elapsed time intac
       tx.oncomplete = () => resolve(); tx.onerror = () => reject(tx.error);
     }); db.close();
   });
-  await page.reload(); await page.getByRole('button', { name: 'Resume' }).click();
+  await page.reload(); await page.getByRole('button', { name: 'Resume puzzle' }).click();
   await expect(page.getByTestId('cell-0-0')).toHaveAttribute('aria-label', /notes 2, 4/);
   await expect(page.getByTestId('timer')).toHaveText('01:13');
   await page.keyboard.press('Control+z'); await expect(page.getByTestId('cell-0-0')).toHaveAttribute('aria-label', /notes 2$/);

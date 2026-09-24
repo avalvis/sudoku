@@ -16,7 +16,7 @@ test('Archive pages reach the expanded pack, reset on filters, and launch an add
   await page.getByRole('button', { name: 'Open puzzle', exact: true }).click();
   await expect(page.getByText(/No. 036/)).toBeVisible();
   await page.getByRole('button', { name: /^Hint/ }).click();
-  await page.reload(); await page.getByRole('button', { name: 'Resume' }).click();
+  await page.reload(); await page.getByRole('button', { name: 'Resume puzzle' }).click();
   await expect(page.getByText(/No. 036/)).toBeVisible();
   await expect(page.getByRole('button', { name: /^Hint/ })).toHaveAttribute('title', '1 hints remaining');
 });

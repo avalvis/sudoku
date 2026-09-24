@@ -32,10 +32,11 @@ function ClassicWorkspace({ open }: { open: (dialog: RequestedDialog) => void })
   const puzzleId = useGame(s => s.session.puzzleId);
   const edition = String(puzzles.findIndex(p => p.id === puzzleId) + 1).padStart(3, '0');
   const daily = isDaily(puzzleId);
+  const openNewGame = useCallback(() => open('new'), [open]);
   return <main id="main-content" tabIndex={-1} className={`main-content ${daily ? 'daily-game' : ''}`}>
     <div className="page-heading"><h1>{daily ? 'Daily' : 'Classic'}</h1>{!daily && <span className="eyebrow">No. {edition}</span>}</div>
     {daily && <DailyEditionBar />}
-    <div className="game-workspace"><SudokuBoard /><GameControlPanel onNewGame={() => open('new')} onRestart={() => open('restart')} onDifficulty={() => open('difficulty')} /></div>
+    <div className="game-workspace"><SudokuBoard onNewGame={openNewGame} /><GameControlPanel onNewGame={openNewGame} onRestart={() => open('restart')} onDifficulty={() => open('difficulty')} /></div>
   </main>;
 }
 

@@ -17,7 +17,7 @@ try {
   await expect(page.getByTestId('opening')).toHaveCount(0);
   await expect(page.locator('#main-content')).toBeVisible();
   await expect(page.locator('[role="gridcell"]')).toHaveCount(81);
-  const resume = page.getByRole('button', { name: 'Resume' });
+  const resume = page.getByRole('button', { name: 'Resume puzzle' });
   if (await resume.isVisible()) await resume.click();
   if (process.argv.includes('--restore')) {
     await expect(page.getByTestId('cell-0-0')).toHaveAttribute('aria-label', /notes 2, 4/);
