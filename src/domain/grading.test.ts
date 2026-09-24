@@ -2,6 +2,18 @@ import { expect, it } from 'vitest';
 import { gradePuzzle } from './grading';
 import { puzzles } from './puzzles';
 
+it('certifies the new pack by solving within its declared technique tier', () => {
+  const expected = { easy: 'Singles', medium: 'Locked candidates', hard: 'Naked pairs' };
+  const graded = puzzles.filter(p => p.id.startsWith('graded-v1-'));
+  expect(graded).toHaveLength(9);
+  for (const puzzle of graded) {
+    const result = gradePuzzle(puzzle.givens);
+    expect(result.solved).toBe(true);
+    expect(result.technique).toBe(expected[puzzle.difficulty]);
+    expect(result.grid).toEqual(puzzle.solution);
+  }
+});
+
 it('only derives digits consistent with the independently validated solution', () => {
   for (const puzzle of puzzles) {
     const result = gradePuzzle(puzzle.givens);

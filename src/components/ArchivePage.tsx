@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { ArrowRight } from 'lucide-react';
-import { puzzles } from '../domain/puzzles';
+import { puzzles, isTechniqueGraded } from '../domain/puzzles';
 import { DIFFICULTIES, type DifficultyFilter } from '../domain/statistics';
 import { formatTime } from '../domain/format';
 import type { Puzzle } from '../domain/types';
@@ -12,6 +12,7 @@ export function ArchivePage() {
   const results = useGame(s => s.results);
   const [difficulty, setDifficulty] = useState<DifficultyFilter>('all');
   const [uncompleted, setUncompleted] = useState(false);
+  const [gradedOnly, setGradedOnly] = useState(false);
   const [selected, setSelected] = useState<Puzzle | null>(null);
   const [page, setPage] = useState(0);
   const entries = puzzles.map((puzzle, index) => {
@@ -21,7 +22,7 @@ export function ArchivePage() {
       current: puzzle.id === session.puzzleId,
       best: normal.length ? normal.reduce((best, result) => Math.min(best, result.elapsedSeconds), Infinity) : null };
   });
-  const visible = entries.filter(({ puzzle, completed }) => (difficulty === 'all' || puzzle.difficulty === difficulty) && (!uncompleted || !completed.length));
+  const visible = entries.filter(({ puzzle, completed }) => (difficulty === 'all' || puzzle.difficulty === difficulty) && (!uncompleted || !completed.length) && (!gradedOnly || isTechniqueGraded(puzzle.id)));
   const pageCount = Math.max(1, Math.ceil(visible.length / 9));
   const currentPage = Math.min(page, pageCount - 1);
   const changePage = (next: number) => { setPage(next); document.getElementById('archive-results')?.focus(); };
@@ -32,7 +33,7 @@ export function ArchivePage() {
   };
   return <main id="main-content" tabIndex={-1} className="stats-page archive-page">
     <header className="stats-heading"><h1>Archive</h1></header>
-    <div className="stats-toolbar"><label className="archive-uncompleted"><input type="checkbox" checked={uncompleted} onChange={event => { setUncompleted(event.target.checked); setPage(0); }} />Not yet completed</label><label className="stats-difficulty">Difficulty<select aria-label="Filter archive by difficulty" value={difficulty} onChange={event => { setDifficulty(event.target.value as DifficultyFilter); setPage(0); }}><option value="all">All difficulties</option>{DIFFICULTIES.map(d => <option key={d} value={d}>{d[0].toUpperCase() + d.slice(1)}</option>)}</select></label></div>
+    <div className="stats-toolbar"><label className="archive-uncompleted"><input type="checkbox" checked={gradedOnly} onChange={event => { setGradedOnly(event.target.checked); setPage(0); }} />Technique graded</label><label className="archive-uncompleted"><input type="checkbox" checked={uncompleted} onChange={event => { setUncompleted(event.target.checked); setPage(0); }} />Not yet completed</label><label className="stats-difficulty">Difficulty<select aria-label="Filter archive by difficulty" value={difficulty} onChange={event => { setDifficulty(event.target.value as DifficultyFilter); setPage(0); }}><option value="all">All difficulties</option>{DIFFICULTIES.map(d => <option key={d} value={d}>{d[0].toUpperCase() + d.slice(1)}</option>)}</select></label></div>
     <p id="archive-results" tabIndex={-1} className="archive-count" role="status">{visible.length} {visible.length === 1 ? 'puzzle' : 'puzzles'} · {entries.filter(e => e.completed.length).length} of {puzzles.length} completed · Page {currentPage + 1} of {pageCount}</p>
     <div className="archive-grid">{visible.slice(currentPage * 9, currentPage * 9 + 9).map(({ puzzle, edition, current, completed, normal, best }) => <article className="archive-card" key={puzzle.id} aria-labelledby={`title-${puzzle.id}`}>
       <div className="archive-card-heading"><span className="eyebrow">No. {edition}</span><span className="capitalize"><i className={`difficulty-dot ${puzzle.difficulty}`} />{puzzle.difficulty}</span></div>
@@ -44,7 +45,7 @@ export function ArchivePage() {
       {(!current || session.status === 'completed') && <button className={current ? 'secondary-button' : 'primary-button'} onClick={() => setSelected(puzzle)}>{completed.length ? 'Replay puzzle' : 'Start puzzle'}<ArrowRight size={15} /></button>}
     </article>)}</div>
     {pageCount > 1 && <nav className="journal-pagination" aria-label="Archive pages"><button className="secondary-button" disabled={currentPage === 0} onClick={() => changePage(currentPage - 1)}>Previous page</button><span>Page {currentPage + 1} of {pageCount}</span><button className="secondary-button" disabled={currentPage === pageCount - 1} onClick={() => changePage(currentPage + 1)}>Next page</button></nav>}
-    {!visible.length && <div className="journal-empty"><p>No puzzles match these filters.</p><button className="secondary-button" onClick={() => { setDifficulty('all'); setUncompleted(false); }}>Show all puzzles</button></div>}
+    {!visible.length && <div className="journal-empty"><p>No puzzles match these filters.</p><button className="secondary-button" onClick={() => { setDifficulty('all'); setUncompleted(false); setGradedOnly(false); }}>Show all puzzles</button></div>}
     {selected && <Dialog title="Open puzzle?" eyebrow={`Classic / ${selected.difficulty} / ${selected.id}`} onClose={() => setSelected(null)}>
       <p>{session.started && session.status !== 'completed' ? 'This replaces your unfinished board. The current attempt will be saved as abandoned.' : 'Start a new attempt. Previous results are kept.'}</p>
       <div className="dialog-actions"><button className="secondary-button" onClick={() => setSelected(null)}>Cancel</button><button className="primary-button" onClick={start}>Open puzzle</button></div>

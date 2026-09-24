@@ -2,13 +2,13 @@
 
 Generated with `node scripts/audit-puzzle-quality.mjs`. This audit uses naked/hidden singles, locked candidates, and naked pairs. It does not guess. Stalled puzzles remain ungraded, not automatically Hard.
 
-All 36 bundled puzzles separately pass unique-solution verification. Current display difficulty labels remain clue-density labels for compatibility; this report is not a professional certification or a comparison with Sudoku.com.
+All 45 bundled puzzles separately pass unique-solution verification. The original 36 retain clue-density labels for compatibility. The nine graded-v1 puzzles must solve completely with singles (Easy), locked candidates (Medium), or naked pairs (Hard), using this deterministic solver. These are technique tiers, not human-calibrated difficulty scores or a comparison with Sudoku.com.
 
 | Label | Singles | Locked candidates | Naked pairs | Beyond supported |
 | --- | ---: | ---: | ---: | ---: |
-| easy | 12 | 0 | 0 | 0 |
-| medium | 11 | 0 | 0 | 1 |
-| hard | 9 | 0 | 0 | 3 |
+| easy | 15 | 0 | 0 | 0 |
+| medium | 11 | 3 | 0 | 1 |
+| hard | 9 | 0 | 3 | 3 |
 
 ## Per-puzzle results
 
@@ -50,6 +50,15 @@ All 36 bundled puzzles separately pass unique-solution verification. Current dis
 | hard-10 | Beyond supported techniques | 24 |
 | hard-11 | Singles | 0 |
 | hard-12 | Singles | 0 |
+| graded-v1-easy-1 | Singles | 0 |
+| graded-v1-easy-2 | Singles | 0 |
+| graded-v1-easy-3 | Singles | 0 |
+| graded-v1-medium-1 | Locked candidates | 0 |
+| graded-v1-medium-2 | Locked candidates | 0 |
+| graded-v1-medium-3 | Locked candidates | 0 |
+| graded-v1-hard-1 | Naked pairs | 0 |
+| graded-v1-hard-2 | Naked pairs | 0 |
+| graded-v1-hard-3 | Naked pairs | 0 |
 
 ## Production quality requirements
 
@@ -58,6 +67,6 @@ All 36 bundled puzzles separately pass unique-solution verification. Current dis
 - Calibrate tiers with human solve data and independent review. Technique complexity and dependencies matter, not just clue count.
 - Preserve existing Daily mappings and saved puzzle IDs. A future generator needs its own version and stored givens/solution, plus migration coverage.
 
-The current Daily mode safely produces uniquely solvable transformations of the original nine fixtures. It does not provide independently generated, professionally calibrated daily challenges. No parity with Sudoku.com is claimed.
+Daily dates through 2026-09-24 retain their original mappings. From 2026-09-25, Daily transforms the new graded fixtures and rechecks the assigned technique tier, with a bounded validated-fixture fallback. Tests verify 90 distinct daily layouts with unique solutions and matching grades. These are still transformations of nine underlying puzzles, not independently authored daily challenges. Human calibration and a wider graded library remain necessary before claiming professional parity.
 
 Reference: [Difficulty Rating of Sudoku Puzzles: An Overview and Evaluation](https://arxiv.org/abs/1403.7373).

@@ -17,20 +17,22 @@ try {
   if (await resume.isVisible()) await resume.click();
   if (!process.argv.includes('--restore')) {
     await page.getByRole('link', { name: 'Archive', exact: true }).click();
+    await page.getByRole('checkbox', { name: 'Technique graded' }).check();
     await expect(page.getByRole('article')).toHaveCount(9);
     await page.getByRole('combobox').selectOption('hard');
-    await page.getByRole('button', { name: 'Next page', exact: true }).click();
-    await expect(page.getByRole('article')).toHaveCount(6);
-    await page.getByRole('article', { name: 'Puzzle 036' }).getByRole('button', { name: 'Start puzzle' }).click();
+
+    await expect(page.getByRole('article')).toHaveCount(3);
+    await page.getByRole('article', { name: 'Puzzle 043' }).getByRole('button', { name: 'Start puzzle' }).click();
     await page.getByRole('button', { name: 'Open puzzle', exact: true }).click();
     await page.getByRole('gridcell', { name: /empty/ }).first().click(); await page.keyboard.press('n'); await page.keyboard.press('2');
   }
-  await expect(page.getByText(/No. 036/)).toBeVisible();
+  await expect(page.getByText(/No. 043/)).toBeVisible();
   await expect(page.getByRole('gridcell', { name: /notes 2/ })).toBeVisible();
   await page.getByRole('link', { name: 'Archive', exact: true }).click();
+  await page.getByRole('checkbox', { name: 'Technique graded' }).check();
   await page.getByRole('combobox').selectOption('hard');
-  await page.getByRole('button', { name: 'Next page', exact: true }).click();
-  const current = page.getByRole('article', { name: 'Puzzle 036' });
+
+  const current = page.getByRole('article', { name: 'Puzzle 043' });
   await expect(current).toContainText('Your puzzle in progress');
   await current.getByRole('link', { name: 'Return to puzzle' }).click();
   await page.getByRole('button', { name: 'Resume' }).click();
@@ -43,8 +45,8 @@ try {
       r.onsuccess = () => resolve(JSON.parse(r.result)); r.onerror = () => reject(r.error); tx.oncomplete = () => db.close();
     });
   });
-  expect(save.state.session.puzzleId).toBe('hard-12');
+  expect(save.state.session.puzzleId).toBe('graded-v1-hard-1');
   expect(save.state.results).toHaveLength(0);
   expect(errors).toEqual([]);
-  console.log(`Installed expanded pack ${process.argv.includes('--restore') ? 'relaunch' : 'selection'} passed: puzzle 036, notes, pagination, and no runtime errors.`);
+  console.log(`Installed graded pack ${process.argv.includes('--restore') ? 'relaunch' : 'selection'} passed: puzzle 043, notes, filter, and no runtime errors.`);
 } finally { await browser.close(); }

@@ -72,7 +72,7 @@ export function createGameStore(storage: StateStorage = indexedDbStorage, now = 
         session,
         results: status === 'completed' ? recordResult(state.results, session, 'completed', session.completedAt) : state.results,
         conflictEvent: state.conflictEvent + (conflict ? 1 : 0),
-        announcement: status === 'completed' ? 'Puzzle complete. Puzzle complete' : conflict ? `Duplicate ${after.value}. ${mistakes} mistakes.` :
+        announcement: status === 'completed' ? 'Puzzle complete.' : conflict ? `Duplicate ${after.value}. ${mistakes} mistakes.` :
           hint ? `Hint: ${after.value} placed in row ${position.row + 1}, column ${position.col + 1}.` : after.value ? `${after.value} placed.` : after.notes.length ? 'Pencil notes updated.' : 'Cell cleared.',
       });
       play(status === 'completed' ? 'success' : conflict ? 'alert' : after.notes.length ? 'pencil' : 'tap');

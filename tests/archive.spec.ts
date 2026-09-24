@@ -40,8 +40,8 @@ test('archive completion, replay, and current-board return preserve journal', as
   }
   await page.getByRole('button', { name: 'Review board' }).click();
   await page.getByRole('link', { name: 'Archive', exact: true }).click();
-  await page.getByRole('checkbox').check(); await expect(page.getByRole('article', { name: 'Puzzle 004' })).toHaveCount(0);
-  await page.getByRole('checkbox').uncheck();
+  await page.getByRole('checkbox', { name: 'Not yet completed' }).check(); await expect(page.getByRole('article', { name: 'Puzzle 004' })).toHaveCount(0);
+  await page.getByRole('checkbox', { name: 'Not yet completed' }).uncheck();
   const card = page.getByRole('article', { name: 'Puzzle 004' });
   await expect(card).toContainText('Current board · complete');
   await card.getByRole('button', { name: 'Replay puzzle' }).click();

@@ -46,7 +46,7 @@ Version 0.6.0 uses the name **Sudoku**, publisher **Antonis Valvis**, and websit
 - At three mistakes, restart or continue without a limit in Practice. Undo restores the board, not consumed hints, mistakes, or elapsed time.
 - Two hints per puzzle fill the selected empty/incorrect editable cell; otherwise the first eligible cell is used.
 - The clock pauses when the app loses focus, becomes hidden, leaves Classic, or restores a saved game. Resume is explicit.
-- A full, valid board completes the puzzle. Review it or start the next puzzle. New games cycle through twelve puzzles at the selected difficulty.
+- A full, valid board completes the puzzle. Review it or start the next puzzle. New games cycle through fifteen puzzles at the selected difficulty. Enable **Technique graded** in Archive to browse the nine new graded puzzles directly.
 
 ## Architecture
 
@@ -77,13 +77,13 @@ Web Audio creates its context only after a user gesture. Sounds use short oscill
 
 ## Archive
 
-The Archive browses all 36 bundled puzzles in pages of nine, with board previews, difficulty filters, and a not-yet-completed filter. Filters return to the first page. Cards show completion counts (including Practice) and the best normal-game time. Returning to the current board preserves its progress; starting another puzzle or replay requires confirmation. Replays have new attempt IDs and retain all prior journal entries. The Archive shares the Classic engine and version-3 save format.
+The Archive browses all 45 bundled puzzles in pages of nine, with board previews, difficulty filters, and a not-yet-completed filter. Filters return to the first page. Cards show completion counts (including Practice) and the best normal-game time. Returning to the current board preserves its progress; starting another puzzle or replay requires confirmation. Replays have new attempt IDs and retain all prior journal entries. The Archive shares the Classic engine and version-3 save format.
 
 ## Daily editions
 
 Daily opens the device's current local date and works entirely offline. The date picker supports editions from 1 January 2026 through today; a saved-editions selector returns to earlier boards. Each date has a fixed difficulty. At midnight, the open board stays in place and an explicit button offers today's edition. There is no server clock or online leaderboard.
 
-Daily puzzles use deterministic digit, row, column, band, stack, and transpose transformations of the nine validated base fixtures. These preserve unique solvability; they are variations of the existing pack, not independently authored daily puzzles. The date-to-puzzle algorithm and base fixtures must stay stable for existing saves. A snapshot test pins a published edition; solution tests exercise a month of dates.
+Daily dates through 24 September 2026 use deterministic digit, row, column, band, stack, and transpose transformations of the nine original validated base fixtures. These preserve unique solvability; they are variations of the existing pack, not independently authored daily puzzles. From 25 September 2026, a versioned schedule uses the nine technique-graded fixtures. Every transformed board must still solve at its assigned technique tier; bounded retries fall back to a verified base fixture. A 32-entry cache avoids regrading on each move. The date-to-puzzle algorithms and base fixtures must stay stable for existing saves. A snapshot test pins a published edition; solution tests exercise a month of dates.
 
 The active board uses the existing gameplay components and actions. Switching modes or dates checkpoints and pauses it into `savedGames`, keyed by `classic` or `daily-YYYY-MM-DD`, then restores the selected edition atomically. Each edition retains its session ID, board, notes, full Undo history, timer, and counters. Switching never records abandonment. Restart affects only the open edition and retains previous results. Daily results are labeled by date in Stats; completed-day counts include Practice, with no streak system yet.
 
@@ -107,7 +107,7 @@ Version 0.5.0 adds 27 fixtures in `expanded-pack.json`, reproducibly authored by
 
 Runtime puzzle generation, formally graded puzzle packs, cloud synchronization, daily streaks, automatic updates, signing, and Android are deferred. The game engine and persisted model do not depend on the desktop layout.
 
-Run `node scripts/audit-puzzle-quality.mjs` to regenerate [PUZZLE_QUALITY.md](PUZZLE_QUALITY.md). The bounded logical solver checks singles, locked candidates, and naked pairs without guessing. The current Medium and Hard packs are mostly solvable with singles, so their clue-based labels must not be advertised as professional difficulty ratings. Daily transformations preserve unique solutions, but do not provide independently generated, professionally calibrated daily puzzles. The report documents the gates required before introducing a new generator; published date mappings remain stable.
+Run `node scripts/audit-puzzle-quality.mjs` to regenerate [PUZZLE_QUALITY.md](PUZZLE_QUALITY.md). The bounded logical solver checks singles, locked candidates, and naked pairs without guessing. The original Medium and Hard packs are mostly solvable with singles, so their clue-based labels must not be advertised as professional difficulty ratings. Version 0.7.0 appends nine technique-graded puzzles: Singles for Easy, Locked candidates for Medium, and Naked pairs for Hard. Generate them reproducibly with `node scripts/create-graded-pack.mjs`; bounded authoring rejects unsupported grades and nonunique solutions before writing the pack. Daily transformations preserve unique solutions and now verify technique tiers, but do not provide independently authored, human-calibrated daily puzzles. The report documents the gates required before introducing a new generator; published date mappings remain stable.
 
 ## Test coverage
 
@@ -125,4 +125,6 @@ Layout checks cover 900×700, 1280×900, 1440×900, 1920×1080, and 2560×1080 i
 
 `scripts/native-expanded-smoke.mjs` checks Archive pagination, opens added puzzle 036, and verifies its saved notes on relaunch with `--restore`. The same isolated-profile precautions apply.
 
-After `npm run desktop:build`, run `node scripts/release-checksums.mjs` to write SHA-256 hashes for the matching EXE and MSI into `src-tauri/target/release/bundle/SHA256SUMS.txt`. These identify the exact build artifacts; they do not replace publisher signing. Outstanding native release checks are tracked in `VERIFICATION.md`.
+`scripts/native-graded-smoke.mjs` checks the technique filter, opens graded puzzle 043, and verifies saved notes on process restart with `--restore`. Use a fresh isolated profile for its first pass.
+
+After `npm run desktop:build`, run `node scripts/release-checksums.mjs` to write SHA-256 hashes for the matching EXE and MSI into `src-tauri/target/release/bundle/SHA256SUMS.txt`. These identify the exact build artifacts; they do not replace publisher signing. Outstanding native release checks are tracked in `VERIFICATION.md`; runnable administrator/offline checks and the signing/DPI handoff are described in [WINDOWS_RELEASE.md](WINDOWS_RELEASE.md).
