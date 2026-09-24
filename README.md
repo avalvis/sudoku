@@ -44,7 +44,7 @@ The Windows CI workflow runs lint, TypeScript, unit/component tests, browser tes
 - At three mistakes, restart or continue without a limit in Practice. Undo restores the board, not consumed hints, mistakes, or elapsed time.
 - Two hints per puzzle fill the selected empty/incorrect editable cell; otherwise the first eligible cell is used.
 - The clock pauses when the app loses focus, becomes hidden, leaves Classic, or restores a saved game. Resume is explicit.
-- A full, valid board completes the puzzle. Review it or start the next puzzle. New games cycle through three puzzles at the selected difficulty.
+- A full, valid board completes the puzzle. Review it or start the next puzzle. New games cycle through twelve puzzles at the selected difficulty.
 
 ## Architecture
 
@@ -75,7 +75,7 @@ Web Audio creates its context only after a user gesture. Sounds use short oscill
 
 ## Archive
 
-The Archive browses all nine bundled puzzles with board previews, difficulty filters, and a not-yet-completed filter. Cards show completion counts (including Practice) and the best normal-game time. Returning to the current board preserves its progress; starting another puzzle or replay requires confirmation. Replays have new attempt IDs and retain all prior journal entries. The Archive shares the Classic engine and version-3 save format.
+The Archive browses all 36 bundled puzzles in pages of nine, with board previews, difficulty filters, and a not-yet-completed filter. Filters return to the first page. Cards show completion counts (including Practice) and the best normal-game time. Returning to the current board preserves its progress; starting another puzzle or replay requires confirmation. Replays have new attempt IDs and retain all prior journal entries. The Archive shares the Classic engine and version-3 save format.
 
 ## Daily editions
 
@@ -99,7 +99,9 @@ Reference conflicts were resolved in favor of the approved plan: four utility ac
 
 The included nine original fixtures are reproducibly authored by `scripts/create-puzzle-pack.mjs`, with 43/33/26 givens for Easy/Medium/Hard. Each is tested for a unique solution matching its stored solution. These initial difficulty labels use clue density; they are not a formal human-technique difficulty rating. The authoring script is not included in the app bundle.
 
-Independent puzzle generation, formally graded puzzle packs, cloud synchronization, daily streaks, automatic updates, signing, and Android are deferred. The game engine and persisted model do not depend on the desktop layout.
+Version 0.5.0 adds 27 fixtures in `expanded-pack.json`, reproducibly authored by `node scripts/create-expanded-pack.mjs`. It generates randomized complete grids by backtracking, then removes clues while retaining exactly one solution. There are now 12 puzzles per difficulty. The original nine stay first in the catalog; new entries are appended so edition numbers, IDs, saves, and Daily mappings remain compatible. Daily intentionally continues to use the original pack. Do not reorder or change published fixtures.
+
+Runtime puzzle generation, formally graded puzzle packs, cloud synchronization, daily streaks, automatic updates, signing, and Android are deferred. The game engine and persisted model do not depend on the desktop layout.
 
 ## Test coverage
 
@@ -114,3 +116,7 @@ Layout checks cover 900×700, 1280×900, 1440×900, 1920×1080, and 2560×1080 i
 `scripts/native-archive-smoke.mjs` opens a specific Archive puzzle, adds a note, and verifies return-to-board behavior; `--restore` checks that selection and notes survive native relaunch. Use a new isolated profile for its first run.
 
 `scripts/native-daily-smoke.mjs` checks independent Classic and Daily progress, including a process restart with `--restore`. Run against a new isolated profile on the same local calendar date for both passes.
+
+`scripts/native-expanded-smoke.mjs` checks Archive pagination, opens added puzzle 036, and verifies its saved notes on relaunch with `--restore`. The same isolated-profile precautions apply.
+
+After `npm run desktop:build`, run `node scripts/release-checksums.mjs` to write SHA-256 hashes for the matching EXE and MSI into `src-tauri/target/release/bundle/SHA256SUMS.txt`. These identify the exact build artifacts; they do not replace publisher signing. Outstanding native release checks are tracked in `VERIFICATION.md`.

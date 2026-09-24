@@ -7,7 +7,7 @@ test('archive filters, cancellation, exact puzzle selection, and restoration', a
   await page.getByRole('link', { name: 'Archive', exact: true }).click();
   await expect(page.getByRole('article')).toHaveCount(9);
   await page.getByRole('combobox').selectOption('hard');
-  await expect(page.getByRole('article')).toHaveCount(3);
+  await expect(page.getByRole('article')).toHaveCount(9);
   const card = page.getByRole('article', { name: 'Puzzle 008' });
   const start = card.getByRole('button', { name: 'Start puzzle' });
   await start.click(); await expect(page.getByRole('dialog')).toContainText('abandoned');
@@ -40,7 +40,7 @@ test('archive completion, replay, and current-board return preserve journal', as
   }
   await page.getByRole('button', { name: 'Review board' }).click();
   await page.getByRole('link', { name: 'Archive', exact: true }).click();
-  await page.getByRole('checkbox').check(); await expect(page.getByRole('article')).toHaveCount(8);
+  await page.getByRole('checkbox').check(); await expect(page.getByRole('article', { name: 'Puzzle 004' })).toHaveCount(0);
   await page.getByRole('checkbox').uncheck();
   const card = page.getByRole('article', { name: 'Puzzle 004' });
   await expect(card).toContainText('Current board · complete');

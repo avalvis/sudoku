@@ -17,19 +17,22 @@ try {
     await page.getByRole('link', { name: 'Archive', exact: true }).click();
     await expect(page.getByRole('article')).toHaveCount(9);
     await page.getByRole('combobox').selectOption('hard');
-    await expect(page.getByRole('article')).toHaveCount(9);
-    await page.getByRole('article', { name: 'Puzzle 008' }).getByRole('button', { name: 'Start puzzle' }).click();
+    await page.getByRole('button', { name: 'Next page', exact: true }).click();
+    await expect(page.getByRole('article')).toHaveCount(3);
+    await page.getByRole('article', { name: 'Puzzle 036' }).getByRole('button', { name: 'Start puzzle' }).click();
     await page.getByRole('button', { name: 'Open puzzle', exact: true }).click();
-    await page.getByTestId('cell-0-0').click(); await page.keyboard.press('n'); await page.keyboard.press('2');
+    await page.getByRole('gridcell', { name: /empty/ }).first().click(); await page.keyboard.press('n'); await page.keyboard.press('2');
   }
-  await expect(page.getByText(/No. 008/)).toBeVisible();
-  await expect(page.getByTestId('cell-0-0')).toHaveAttribute('aria-label', /notes 2/);
+  await expect(page.getByText(/No. 036/)).toBeVisible();
+  await expect(page.getByRole('gridcell', { name: /notes 2/ })).toBeVisible();
   await page.getByRole('link', { name: 'Archive', exact: true }).click();
-  const current = page.getByRole('article', { name: 'Puzzle 008' });
+  await page.getByRole('combobox').selectOption('hard');
+  await page.getByRole('button', { name: 'Next page', exact: true }).click();
+  const current = page.getByRole('article', { name: 'Puzzle 036' });
   await expect(current).toContainText('Your puzzle in progress');
   await current.getByRole('link', { name: 'Return to puzzle' }).click();
   await page.getByRole('button', { name: 'Back to the puzzle' }).click();
-  await expect(page.getByTestId('cell-0-0')).toHaveAttribute('aria-label', /notes 2/);
+  await expect(page.getByRole('gridcell', { name: /notes 2/ })).toBeVisible();
   await page.getByRole('button', { name: 'Pause game' }).click();
   const save = await page.evaluate(async () => {
     const db = await new Promise((resolve, reject) => { const r = indexedDB.open('keyval-store'); r.onsuccess = () => resolve(r.result); r.onerror = () => reject(r.error); });
@@ -38,8 +41,8 @@ try {
       r.onsuccess = () => resolve(JSON.parse(r.result)); r.onerror = () => reject(r.error); tx.oncomplete = () => db.close();
     });
   });
-  expect(save.state.session.puzzleId).toBe('hard-2');
+  expect(save.state.session.puzzleId).toBe('hard-12');
   expect(save.state.results).toHaveLength(0);
   expect(errors).toEqual([]);
-  console.log(`Native Archive ${process.argv.includes('--restore') ? 'relaunch' : 'selection'} passed: exact puzzle, notes, current-board return, and no spurious abandoned results.`);
+  console.log(`Installed expanded pack ${process.argv.includes('--restore') ? 'relaunch' : 'selection'} passed: puzzle 036, notes, pagination, and no runtime errors.`);
 } finally { await browser.close(); }

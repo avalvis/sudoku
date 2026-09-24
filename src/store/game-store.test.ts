@@ -101,7 +101,7 @@ describe('game store', () => {
     const { store } = setup(); store.getState().hint(); store.getState().newGame('medium', true);
     expect(store.getState().session).toMatchObject({ puzzleId: 'medium-1', hintsRemaining: 2, mistakes: 0 });
     expect(store.getState().history).toHaveLength(0);
-    for (const id of ['medium-2', 'medium-3', 'medium-1']) { store.getState().newGame('medium'); expect(store.getState().session.puzzleId).toBe(id); }
+    for (const id of [...Array.from({ length: 11 }, (_, i) => `medium-${i + 2}`), 'medium-1']) { store.getState().newGame('medium'); expect(store.getState().session.puzzleId).toBe(id); }
     store.getState().newGame('hard'); expect(store.getState().session.puzzleId).toBe('hard-1');
   });
   it('persists and restores complete undo history with the timer paused', async () => {

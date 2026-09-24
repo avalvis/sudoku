@@ -6,9 +6,10 @@ import { DIGITS, type Board, type Digit } from './types';
 const blank = (): Board => Array.from({ length: 9 }, () => Array.from({ length: 9 }, () => ({ value: null, given: false, notes: [] })));
 
 describe('puzzle pack', () => {
-  it('contains three distinct, valid, uniquely solvable puzzles per difficulty', () => {
-    expect(new Set(puzzles.map(p => JSON.stringify(p.givens))).size).toBe(9);
-    for (const d of ['easy', 'medium', 'hard']) expect(puzzles.filter(p => p.difficulty === d)).toHaveLength(3);
+  it('contains twelve distinct, valid, uniquely solvable puzzles per difficulty', () => {
+    expect(new Set(puzzles.map(p => JSON.stringify(p.givens))).size).toBe(36);
+    expect(new Set(puzzles.map(p => p.id)).size).toBe(36);
+    for (const d of ['easy', 'medium', 'hard']) expect(puzzles.filter(p => p.difficulty === d)).toHaveLength(12);
     for (const p of puzzles) {
       expect(p.solution.flat()).toHaveLength(81);
       const solutions = solve(p.givens);

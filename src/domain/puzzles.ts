@@ -1,8 +1,10 @@
 import data from './puzzle-pack.json';
+import expanded from './expanded-pack.json';
 import type { Difficulty, Puzzle } from './types';
 import { dailyPuzzle, isDaily } from './daily';
 
-export const puzzles = data as Puzzle[];
+// Append only: existing edition numbers and puzzle IDs are permanent.
+export const puzzles = [...data, ...expanded] as Puzzle[];
 export const getPuzzle = (id: string): Puzzle => {
   if (typeof id === 'string' && isDaily(id)) return dailyPuzzle(id.slice(6));
   const puzzle = puzzles.find(p => p.id === id);
