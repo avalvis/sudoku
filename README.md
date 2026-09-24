@@ -61,7 +61,15 @@ State changes go through guarded store actions. Each effective move records the 
 
 The runtime clock uses `performance.now()`. Whole seconds are checkpointed on moves, pause, and every five seconds, retaining fractional time between checkpoints. A forced process termination can lose the most recent uncheckpointed seconds or an in-flight IndexedDB transaction.
 
-The version-1 IndexedDB save contains the board, selection, notes mode, full undo history, session, and preferences. Restore validates cell invariants, immutable givens, session values, and the history chain. Corrupt or unsupported saves are preserved until the player explicitly chooses Start Fresh. If storage is unavailable or full, play continues with a visible warning and later writes retry. There is no artificial Undo limit; practical capacity is bounded by available memory/storage.
+The version-2 IndexedDB save contains the board, selection, notes mode, full undo history, session, preferences, and result journal. Results and board state are committed in one snapshot; stable attempt IDs prevent duplicate completion records. Restore validates cell invariants, immutable givens, session values, the history chain, and result consistency. Corrupt or unsupported saves are preserved until the player explicitly chooses Start Fresh. If storage is unavailable or full, play continues with a visible warning and later writes retry. There is no artificial Undo or journal limit; practical capacity is bounded by available memory/storage.
+
+Version-1 saves migrate automatically with board, notes, Undo, time, and preferences intact. A saved completed puzzle is imported once. Earlier versions did not retain dates or older results, so imported dates are labeled unavailable and previously discarded games cannot be reconstructed.
+
+## Stats and personal journal
+
+Stats shows completion rate, completed puzzles, best and average completion times, mistakes, hints, difficulty breakdowns, and paginated history. Normal and Practice games have separate views, with an optional difficulty filter. All data stays on this device.
+
+An attempt starts on the first effective board change, including a note or hint. Replacing or restarting a started unfinished puzzle records an abandoned attempt; pausing, closing, or navigating away does not. Completion rate includes the current started attempt in its denominator. Undoing every move does not erase the attempt. Continue Practice classifies the whole attempt as Practice. Times include completed games with hints; mistakes and hints remain cumulative. Results are ordered by finalization, even if the system clock changes.
 
 Web Audio creates its context only after a user gesture. Sounds use short oscillator/gain envelopes, disconnect finished nodes, and fail harmlessly if audio is unavailable. Audio objects never enter persisted state.
 
@@ -77,7 +85,7 @@ Reference conflicts were resolved in favor of the approved plan: four utility ac
 
 The included nine original fixtures are reproducibly authored by `scripts/create-puzzle-pack.mjs`, with 43/33/26 givens for Easy/Medium/Hard. Each is tested for a unique solution matching its stored solution. These initial difficulty labels use clue density; they are not a formal human-technique difficulty rating. The authoring script is not included in the app bundle.
 
-Daily, Stats, and Archive are explicitly labeled future editions. Runtime puzzle generation, formally graded puzzle packs, cloud synchronization, a daily calendar, analytics, automatic updates, signing, and Android are deferred. The game engine and persisted model do not depend on the desktop layout.
+Daily and Archive are explicitly labeled future editions. Runtime puzzle generation, formally graded puzzle packs, cloud synchronization, a daily calendar, automatic updates, signing, and Android are deferred. The game engine and persisted model do not depend on the desktop layout.
 
 ## Test coverage
 
@@ -86,3 +94,5 @@ Unit/component tests cover fixture validity, conflicts, immutable givens, notes,
 Layout checks cover 900×700, 1280×900, 1440×900, 1920×1080, and 2560×1080 in both themes. Browser scale-factor tests approximate 125%, 150%, and 200% Windows display scaling; they do not replace a manual Windows DPI check. Screenshots are written to `test-results/`.
 
 `scripts/native-smoke.mjs` connects to a test-launched WebView2 on localhost port 9237 to verify native gameplay; `--restore` checks saved notes and Undo after relaunch. Run it only against an isolated test profile, using `WEBVIEW2_USER_DATA_FOLDER` and `WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS=--remote-debugging-port=9237`. The shipping application does not enable remote debugging.
+
+`scripts/native-stats-smoke.mjs` completes a puzzle and checks its persisted journal entry in native WebView2. Relaunch the app with the same isolated profile and run with `--restore` to check that exactly one result survives the process restart.

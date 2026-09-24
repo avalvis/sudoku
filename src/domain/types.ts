@@ -8,6 +8,10 @@ export interface Puzzle { id: string; difficulty: Difficulty; givens: (Digit | n
 export interface Move { patches: { position: CellPosition; before: Cell; after: Cell }[] }
 export type SessionStatus = 'playing' | 'paused' | 'mistake-limit' | 'completed';
 export interface Session {
+  id: string;
+  started: boolean;
+  startedAt: number | null;
+  completedAt: number | null;
   puzzleId: string;
   difficulty: Difficulty;
   elapsedSeconds: number;
@@ -16,12 +20,28 @@ export interface Session {
   practice: boolean;
   status: SessionStatus;
 }
+export interface GameResult {
+  id: string;
+  puzzleId: string;
+  difficulty: Difficulty;
+  elapsedSeconds: number;
+  mistakes: number;
+  hintsUsed: number;
+  practice: boolean;
+  outcome: 'completed' | 'abandoned';
+  startedAt: number | null;
+  endedAt: number | null;
+}
 export interface SavedGame {
   board: Board;
   selected: CellPosition;
   notesMode: boolean;
   history: Move[];
   session: Session;
+  results: GameResult[];
   theme: 'light' | 'dark';
   soundEnabled: boolean;
 }
+export type LegacySavedGame = Omit<SavedGame, 'session' | 'results'> & {
+  session: Omit<Session, 'id' | 'started' | 'startedAt' | 'completedAt'>;
+};

@@ -2,7 +2,8 @@ import { create } from 'zustand';
 import { createJSONStorage, persist, type StateStorage } from 'zustand/middleware';
 import { createBoard, cellId, findConflicts, isComplete, remainingCounts } from '../domain/rules';
 import { getPuzzle, nextPuzzle } from '../domain/puzzles';
-import { validateSave } from '../domain/validate-save';
+import { migrateSave, validateSave } from '../domain/validate-save';
+import { recordResult } from '../domain/statistics';
 import type { Cell, CellPosition, Difficulty, Digit, Puzzle, SavedGame } from '../domain/types';
 import { audio } from '../services/audio';
 import { indexedDbStorage, onStorageNotice } from '../services/storage';
@@ -35,11 +36,11 @@ const fresh = (p: Puzzle): Pick<SavedGame, 'board' | 'selected' | 'notesMode' | 
   const first = board.flat().findIndex(c => !c.given);
   return {
     board, selected: { row: Math.floor(first / 9), col: first % 9 }, notesMode: false, history: [],
-    session: { puzzleId: p.id, difficulty: p.difficulty, elapsedSeconds: 0, mistakes: 0, hintsRemaining: 2, practice: false, status: 'playing' },
+    session: { id: crypto.randomUUID(), started: false, startedAt: null, completedAt: null, puzzleId: p.id, difficulty: p.difficulty, elapsedSeconds: 0, mistakes: 0, hintsRemaining: 2, practice: false, status: 'playing' },
   };
 };
 
-export function createGameStore(storage: StateStorage = indexedDbStorage, now = () => performance.now()) {
+export function createGameStore(storage: StateStorage = indexedDbStorage, now = () => performance.now(), wallNow = () => Date.now()) {
   let anchor: number | null = null;
   return create<GameStore>()(persist((set, get) => {
     const seconds = () => get().session.elapsedSeconds + (anchor === null ? 0 : Math.max(0, Math.floor((now() - anchor) / 1000)));
@@ -59,11 +60,14 @@ export function createGameStore(storage: StateStorage = indexedDbStorage, now = 
       const mistakes = state.session.mistakes + (conflict && !hint ? 1 : 0);
       const status = isComplete(board) ? 'completed' : mistakes >= 3 && !state.session.practice ? 'mistake-limit' : 'playing';
       const elapsedSeconds = checkpointTime();
+      const startedAt = state.session.started ? state.session.startedAt : wallNow();
+      const session = { ...state.session, started: true, startedAt, completedAt: status === 'completed' ? Math.max(wallNow(), startedAt ?? 0) : null, elapsedSeconds, mistakes, status, hintsRemaining: state.session.hintsRemaining - (hint ? 1 : 0) } as SavedGame['session'];
       if (status !== 'playing') anchor = null;
       set({
         board, selected: position,
         history: [...state.history, { patches: [{ position, before, after }] }],
-        session: { ...state.session, elapsedSeconds, mistakes, status, hintsRemaining: state.session.hintsRemaining - (hint ? 1 : 0) },
+        session,
+        results: status === 'completed' ? recordResult(state.results, session, 'completed', session.completedAt) : state.results,
         conflictEvent: state.conflictEvent + (conflict ? 1 : 0),
         announcement: status === 'completed' ? 'Puzzle complete. Beautifully done.' : conflict ? `Duplicate ${after.value}. ${mistakes} mistakes.` :
           hint ? `Hint: ${after.value} placed in row ${position.row + 1}, column ${position.col + 1}.` : after.value ? `${after.value} placed.` : after.notes.length ? 'Pencil notes updated.' : 'Cell cleared.',
@@ -72,6 +76,7 @@ export function createGameStore(storage: StateStorage = indexedDbStorage, now = 
     }
     return {
       ...fresh(nextPuzzle('medium')),
+      results: [],
       theme: 'light', soundEnabled: true,
       hydrated: false, storageError: null, recoveryNeeded: false, announcement: '', conflictEvent: 0,
       select: position => {
@@ -135,7 +140,10 @@ export function createGameStore(storage: StateStorage = indexedDbStorage, now = 
       newGame: (difficulty, restart = false) => {
         if (!get().hydrated || get().recoveryNeeded) return;
         const p = restart ? getPuzzle(get().session.puzzleId) : nextPuzzle(difficulty, get().session.puzzleId);
-        anchor = now(); set({ ...fresh(p), announcement: 'A fresh page. Enjoy your puzzle.', conflictEvent: 0 });
+        const state = get();
+        const previous = { ...state.session, elapsedSeconds: checkpointTime() };
+        const results = previous.status === 'completed' ? state.results : recordResult(state.results, previous, 'abandoned', Math.max(wallNow(), previous.startedAt ?? 0));
+        anchor = now(); set({ ...fresh(p), results, announcement: 'A fresh page. Enjoy your puzzle.', conflictEvent: 0 });
       },
       toggleTheme: () => { if (get().hydrated && !get().recoveryNeeded) set({ theme: get().theme === 'light' ? 'dark' : 'light' }); },
       toggleSound: () => { if (!get().hydrated || get().recoveryNeeded) return; const enabled = !get().soundEnabled; audio.setMuted(!enabled); set({ soundEnabled: enabled }); if (enabled) play('tap'); },
@@ -151,10 +159,10 @@ export function createGameStore(storage: StateStorage = indexedDbStorage, now = 
       },
     };
   }, {
-    name: 'editorial-sudoku-session', version: 1, skipHydration: true,
+    name: 'editorial-sudoku-session', version: 2, skipHydration: true,
     storage: createJSONStorage(() => storage),
-    partialize: s => ({ board: s.board, selected: s.selected, notesMode: s.notesMode, history: s.history, session: s.session, theme: s.theme, soundEnabled: s.soundEnabled }),
-    migrate: () => { throw new Error('This save uses an unsupported format.'); },
+    partialize: s => ({ board: s.board, selected: s.selected, notesMode: s.notesMode, history: s.history, session: s.session, results: s.results, theme: s.theme, soundEnabled: s.soundEnabled }),
+    migrate: migrateSave,
     merge: (persisted, current) => {
       if (!persisted) return current;
       const saved = validateSave(persisted);

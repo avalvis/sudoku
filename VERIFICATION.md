@@ -3,16 +3,18 @@
 ## Passed
 
 - `npm run lint` and `npm run typecheck`.
-- `npm test`: 22 unit/component tests.
-- `npm run test:e2e`: 16 browser tests, including gameplay completion, unlimited board Undo, hints, mistake-limit/practice transitions, session restoration, corrupt-save recovery, unavailable storage/audio, offline input, numpad input, and dark number contrast of at least 7:1.
+- `npm test`: 41 unit/component tests, including journal accounting, result validation, filters, pagination, and version-1 migration.
+- `npm run test:e2e`: 23 browser tests, including gameplay completion, unlimited board Undo, hints, mistake-limit/practice transitions, session restoration, corrupt-save recovery, unavailable storage/audio, offline input, numpad input, and dark number contrast of at least 7:1. Stats coverage includes completion idempotence across reloads, abandonment confirmation, Practice separation, and real IndexedDB migration preserving notes, Undo, and elapsed time.
+- Stats layouts inspected at 900, 1280, and 1920 pixels in both themes; no horizontal overflow.
 - Desktop layouts inspected in both themes at 900×700, 1280×900, 1440×900, 1920×1080, and 2560×1080. Browser device-scale checks passed at 125%, 150%, and 200%.
 - A follow-up five-layout run passed after fixing the dark page background below short content.
 - `npm run build`: production Vite assets, including locally bundled fonts and licenses.
 - `cargo fmt --manifest-path src-tauri/Cargo.toml --check`.
-- Tauri native release compilation and generation of both NSIS EXE and WiX MSI installers with the WebView2 offline installer.
+- Version 0.2.0 Tauri native release compilation and generation of both NSIS EXE and WiX MSI installers with the WebView2 offline installer.
+- Version 0.2.0 native Stats smoke test: completed a puzzle through the UI, verified one result and 100% completion, then restarted the isolated native process and verified exactly one restored result with no runtime errors. Populated journal screenshot inspected.
 - Native WebView2 smoke test using an isolated profile: bundled fonts, board rendering, keyboard notes, themes, and pause.
 - Full native process restart: saved notes and Undo history restored.
-- NSIS per-user installation and uninstallation both returned exit code 0. The installed executable was launched and passed the native smoke test; uninstallation removed it.
+- Version 0.1.0 NSIS per-user installation and uninstallation both returned exit code 0. The installed executable was launched and passed the native smoke test; uninstallation removed it. Version 0.2.0 was tested directly from its release executable; its installation/uninstallation cycle was not repeated.
 
 ## Environment limitations and release follow-up
 

@@ -1,6 +1,6 @@
 [package]
 name = "editorial-sudoku"
-version = "0.1.0"
+version = "0.2.0"
 description = "A quiet place for a good puzzle"
 authors = ["Editorial Sudoku"]
 edition = "2021"

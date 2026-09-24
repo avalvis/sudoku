@@ -292,3 +292,61 @@ h1 { margin: 6px 0 0; font-family: var(--font-editorial); font-weight: 500; font
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transition-duration: 0s !important; animation-duration: 0s !important; scroll-behavior: auto !important; }
 }
+
+/* The desktop puzzle journal shares the board's ink, rules, and paper. */
+.stats-page { max-width: 1200px; margin: 0 auto; padding: 42px 32px 28px; }
+.stats-heading { display: flex; justify-content: space-between; align-items: center; gap: 28px; margin-bottom: 32px; }
+.stats-heading h1 { font-size: clamp(30px, 3vw, 39px); margin-top: 12px; }
+.stats-heading p { font-size: 13px; line-height: 1.8; color: var(--secondary); margin-top: 13px; }
+.stats-heading > svg { color: var(--amber); flex-shrink: 0; }
+.stats-toolbar { border-block: 1px solid var(--stroke); padding: 16px 0; display: flex; justify-content: space-between; align-items: center; gap: 24px; }
+.stats-mode-switch { display: flex; gap: 5px; }
+.stats-mode-switch button { padding: 10px 15px; color: var(--secondary); border: 1px solid transparent; border-radius: 4px; background: transparent; font-size: 12px; }
+.stats-mode-switch button:hover { color: var(--accent); }
+.stats-mode-switch button[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); background: var(--cell-selected); }
+.stats-difficulty { display: flex; align-items: center; gap: 12px; font-size: 11px; color: var(--secondary); }
+.stats-difficulty select { padding: 10px 30px 10px 12px; border: 1px solid var(--stroke); border-radius: 4px; color: var(--ink); background: var(--surface); font: inherit; font-size: 12px; }
+.stats-difficulty select:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.stats-mode-note { margin: 15px 0 24px; font-size: 12px; color: var(--secondary); }
+.stats-summary { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border: 1px solid var(--stroke); border-top: 2px solid var(--rule); background: var(--surface); }
+.stat-card { padding: 24px 22px; border-right: 1px solid var(--stroke); display: flex; flex-direction: column; gap: 13px; }
+.stat-card:last-child { border-right: 0; }
+.stat-card strong { font-size: clamp(28px, 3vw, 38px); font-weight: 500; color: var(--accent); font-variant-numeric: tabular-nums; letter-spacing: -1px; }
+.stat-card > span:last-child { font-size: 11px; color: var(--secondary); }
+.stats-totals { display: flex; flex-wrap: wrap; gap: 22px; padding: 15px 0; font-size: 12px; color: var(--secondary); }
+.stats-totals strong { font-weight: 600; color: var(--ink); }
+.stats-active { display: flex; align-items: center; gap: 12px; margin-top: 9px; padding: 16px 18px; background: var(--cell-selected); border: 1px solid var(--stroke); color: var(--accent-text); font-size: 12px; }
+.stats-active a { display: flex; align-items: center; gap: 8px; margin-left: auto; font-weight: 600; }
+.stats-introduction { display: flex; align-items: center; gap: 14px; padding: 12px 0; color: var(--amber); }
+.stats-introduction p { margin: 0; font-size: 12px; line-height: 1.8; color: var(--secondary); }
+.stats-introduction a { display: inline-flex; align-items: center; gap: 5px; color: var(--accent); margin-left: 6px; }
+.stats-section { margin-top: 34px; }
+.stats-section-heading { display: flex; justify-content: space-between; align-items: center; gap: 20px; padding-bottom: 17px; }
+.stats-section h2 { font: 500 22px/1.4 var(--font-editorial); letter-spacing: -.5px; margin: 0; }
+.stats-table-scroll { overflow-x: auto; }
+.stats-page table { border-collapse: collapse; width: 100%; text-align: left; font-size: 12px; }
+.stats-page table th, .stats-page table td { padding: 15px 14px; border-bottom: 1px solid var(--stroke); }
+.stats-page table th:first-child, .stats-page table td:first-child { padding-left: 0; }
+.stats-page table th:last-child, .stats-page table td:last-child { padding-right: 0; }
+.stats-page table thead th { border-top: 1px solid var(--rule); font-size: 10px; text-transform: uppercase; letter-spacing: .75px; color: var(--secondary); font-weight: 500; white-space: nowrap; }
+.stats-page table tbody th { font-weight: 500; }
+.difficulty-stats-table td { font-variant-numeric: tabular-nums; }
+.difficulty-stats-table .difficulty-dot { display: inline-block; margin-right: 10px; vertical-align: middle; }
+.result-puzzle { display: block; font-size: 12px; }
+.result-date { display: block; margin-top: 5px; font-size: 10px; color: var(--secondary); font-weight: 400; }
+.result-outcome { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; color: var(--secondary); }
+.result-outcome.completed { color: var(--mint); }
+.stats-numeric { font-variant-numeric: tabular-nums; }
+.journal-empty { display: flex; align-items: center; gap: 20px; border-block: 1px solid var(--stroke); padding: 26px 0; }
+.journal-empty > svg { color: var(--amber); flex-shrink: 0; }
+.journal-empty h3 { font: 500 17px/1.4 var(--font-editorial); margin: 0 0 8px; }
+.journal-empty p { font-size: 12px; line-height: 1.7; color: var(--secondary); margin: 0; }
+.journal-pagination { display: flex; justify-content: space-between; align-items: center; margin-top: 18px; font-size: 11px; color: var(--secondary); }
+.stats-footnote { border-top: 1px solid var(--stroke); margin-top: 36px; padding-top: 17px; color: var(--secondary); }
+.stats-footnote p { font-size: 11px; line-height: 1.9; max-width: 800px; margin: 0; }
+.stats-footnote > span { display: block; font-family: var(--font-editorial); font-size: 11px; margin-top: 18px; color: var(--muted); }
+@media (max-width: 1099px) {
+  .stats-page { padding: 28px 24px; }
+  .stat-card { padding: 20px 15px; }
+  .stat-card .eyebrow { font-size: 9px; letter-spacing: 1px; }
+}

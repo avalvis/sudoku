@@ -20,7 +20,7 @@ export function DialogHost({ requested, close, classic }: { requested: Requested
     <button className="primary-button" onClick={() => { recover(); location.hash = 'classic'; }}>Start fresh</button>
   </Dialog>;
   if (requested) return <Dialog title={requested === 'restart' ? 'Begin again.' : requested === 'difficulty' ? 'Find your pace.' : 'Turn a fresh page.'} eyebrow="The classic collection" onClose={close}>
-    <p>{requested === 'restart' ? 'Reset this puzzle, its timer, mistakes, and hints. Your current progress will be replaced.' : 'Choose a little challenge for your day. Starting a new puzzle replaces your current progress.'}</p>
+    <p>{requested === 'restart' ? 'Reset this puzzle, its timer, mistakes, and hints. Your current progress will be replaced.' : 'Choose a little challenge for your day. Starting a new puzzle replaces your current progress.'}{session.started && session.status !== 'completed' ? ' This attempt will be saved as abandoned in your journal.' : ''}</p>
     {requested !== 'restart' && <fieldset className="difficulty-options"><legend>Difficulty</legend>{(['easy', 'medium', 'hard'] as const).map(d => <label key={d} className={difficulty === d ? 'chosen' : ''}>
       <input type="radio" name="difficulty" value={d} checked={difficulty === d} onChange={() => setDifficulty(d)} />
       <span>{d}</span><small>{d === 'easy' ? 'A gentle start' : d === 'medium' ? 'A thoughtful pause' : 'A deeper focus'}</small>{difficulty === d && <Check size={15} />}

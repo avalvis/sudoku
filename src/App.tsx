@@ -7,6 +7,7 @@ import { GameControlPanel } from './components/Controls';
 import { DialogHost, type RequestedDialog } from './components/DialogHost';
 import { useGameLifecycle } from './hooks/use-game-lifecycle';
 import { puzzles } from './domain/puzzles';
+import { StatsPage } from './components/StatsPage';
 
 const tabs = ['Daily', 'Classic', 'Stats', 'Archive'] as const;
 const readRoute = () => { const route = location.hash.slice(1).toLowerCase(); return tabs.find(t => t.toLowerCase() === route) ?? 'Classic'; };
@@ -26,7 +27,7 @@ function AppHeader({ route }: { route: string }) {
 function ClassicWorkspace({ open }: { open: (dialog: RequestedDialog) => void }) {
   const puzzleId = useGame(s => s.session.puzzleId);
   const edition = String(puzzles.findIndex(p => p.id === puzzleId) + 1).padStart(3, '0');
-  return <main id="main-content" className="main-content">
+  return <main id="main-content" tabIndex={-1} className="main-content">
     <div className="page-heading"><div><span className="eyebrow">The classic collection <span className="heading-dot">/</span> No. {edition}</span><h1>Sudoku<span className="title-period">.</span></h1></div><p>A quiet moment.<br /><em>A sharper mind.</em></p></div>
     <div className="game-workspace"><SudokuBoard /><GameControlPanel onNewGame={() => open('new')} onRestart={() => open('restart')} onDifficulty={() => open('difficulty')} /></div>
     <div className="edition-footer"><span>Made for a little uninterrupted thought.</span><span>One square. One possibility. One more.</span></div>
@@ -34,8 +35,8 @@ function ClassicWorkspace({ open }: { open: (dialog: RequestedDialog) => void })
 }
 
 function FutureFeaturePage({ route }: { route: string }) {
-  const copy: Record<string, string> = { Daily: 'A fresh puzzle for every morning. Our daily edition is still on the drawing board.', Stats: 'A place to reflect on your progress. Your personal puzzle journal is coming in a future edition.', Archive: 'Good puzzles deserve another look. The archive will open in a future edition.' };
-  return <main id="main-content" className="future-page"><BookOpen size={38} strokeWidth={1.2} /><span className="eyebrow">Coming in a future edition</span><h1>{route === 'Daily' ? 'Tomorrow’s ritual.' : route === 'Stats' ? 'Progress, in perspective.' : 'Pages worth keeping.'}</h1><p>{copy[route]}</p><a className="primary-button" href="#classic">Return to Classic <ArrowRight size={16} /></a></main>;
+  const copy: Record<string, string> = { Daily: 'A fresh puzzle for every morning. Our daily edition is still on the drawing board.', Archive: 'Good puzzles deserve another look. The archive will open in a future edition.' };
+  return <main id="main-content" tabIndex={-1} className="future-page"><BookOpen size={38} strokeWidth={1.2} /><span className="eyebrow">Coming in a future edition</span><h1>{route === 'Daily' ? 'Tomorrow’s ritual.' : 'Pages worth keeping.'}</h1><p>{copy[route]}</p><a className="primary-button" href="#classic">Return to Classic <ArrowRight size={16} /></a></main>;
 }
 
 export default function App() {
@@ -47,10 +48,10 @@ export default function App() {
   const [dialog, setDialog] = useState<RequestedDialog>(null);
   useGameLifecycle(route === 'Classic');
   useEffect(() => { document.documentElement.dataset.theme = theme; document.documentElement.classList.toggle('dark', theme === 'dark'); }, [theme]);
-  return <MotionConfig reducedMotion="user"><a className="skip-link" href="#main-content">Skip to puzzle</a>
+  return <MotionConfig reducedMotion="user"><a className="skip-link" href="#main-content" onClick={event => { event.preventDefault(); document.getElementById('main-content')?.focus(); }}>Skip to content</a>
     <AppHeader route={route} />
     {storageError && <div className="storage-notice" role="alert">{storageError}</div>}
-    {!hydrated ? <main className="loading-page"><span className="eyebrow">Opening your edition…</span></main> : route === 'Classic' ? <ClassicWorkspace open={setDialog} /> : <FutureFeaturePage route={route} />}
+    {!hydrated ? <main className="loading-page"><span className="eyebrow">Opening your edition…</span></main> : route === 'Classic' ? <ClassicWorkspace open={setDialog} /> : route === 'Stats' ? <StatsPage /> : <FutureFeaturePage route={route} />}
     <div className="sr-only" role="status" aria-live="polite">{announcement}</div>
     {hydrated && <DialogHost key={dialog ?? 'session'} requested={dialog} close={() => setDialog(null)} classic={route === 'Classic'} />}
   </MotionConfig>;
